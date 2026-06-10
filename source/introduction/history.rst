@@ -6,7 +6,7 @@ GPU 发展简史
 
    The most dangerous phrase in the language is: "We've always done it this way."
 
-   — Grace Hopper, 计算机科学家、COBOL 语言发明者
+   — Grace Hopper
 
 GPU 从专用的图形渲染硬件演变为通用并行计算引擎，经历了三十多年的技术积累和架构变革。
 
@@ -132,7 +132,9 @@ AI 加速时代（2020s）
 
    1.通用化：专用电路 → 可编程 ALU → 灵活计算单元
    2.并行化：核心数持续增长，线程管理硬件日趋复杂
-   3.专用化：Tensor Core、RT Core、Transformer Engine 等专用加速器
+   3. **专用化**：Tensor Core、RT Core、Transformer Engine 等专用加速器
+
+理解 GPU 的发展脉络，有助于预测未来的方向——更通用的计算能力、更强大的专用加速器、更紧密的系统集成。下一章将从硬件结构出发，深入 GPU 芯片的每一个角落。
    4.互联化：NVLink、Infinity Fabric 实现 GPU 间高速通信
    5.虚拟化：MIG、SR-IOV 实现硬件级资源隔离
 

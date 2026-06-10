@@ -6,7 +6,7 @@
 
    Some books are to be tasted, others to be swallowed, and some few to be chewed and digested.
 
-   — Francis Bacon, 哲学家
+   — Francis Bacon
 
 本教程按**从底层到上层**的次序组织，各章节之间存在依赖关系。根据读者的知识背景和阅读目的，推荐不同的阅读路线。
 

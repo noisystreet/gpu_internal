@@ -6,7 +6,7 @@ GPU 生态格局
 
    The best way to predict the future is to invent it.
 
-   — Alan Kay, 图灵奖得主、面向对象编程先驱
+   — Alan Kay
 
 当前 GPU 计算生态由 NVIDIA、AMD 和 Intel 三大厂商主导，每个厂商在硬件架构、软件栈和生态策略上有各自的取舍。
 

@@ -6,7 +6,7 @@ SR-IOV 与 vGPU
 
    Any sufficiently advanced technology is indistinguishable from magic.
 
-   — Arthur C. Clarke, 科幻作家
+   — Arthur C. Clarke
 
 SR-IOV（Single Root I/O Virtualization）是一种 PCIe 标准，允许一个物理设备呈现为多个独立的虚拟设备。
 

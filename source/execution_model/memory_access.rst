@@ -6,7 +6,7 @@
 
    We should forget about small efficiencies, say about 97% of the time: premature optimization is the root of all evil.
 
-   — Donald Knuth, 图灵奖得主、《计算机程序设计艺术》作者
+   — Donald Knuth
 
 GPU 的性能高度依赖于内存访问模式。理解 GPU 的内存子系统特性并编写缓存友好的访问模式是 GPU 优化的核心。
 
@@ -155,6 +155,100 @@ NVIDIA 的 Kepler 架构开始引入了只读缓存（Read-Only Cache），通�
    * - 使用向量化加载
      - ``float4`` / ``int4`` 等向量类型
      - 减少指令数量，提高带宽利用率
+
+L2 缓存分区与 Partition Camping
+=========================================
+
+L2 缓存被划分为多个独立分区（Ampere 有 40 个，Hopper 有 60 个），每个分区管理一段连续的显存地址范围。当大量线程同时访问同一个 L2 分区的地址时，就会产生**分区不平衡（partition camping）** 现象——该分区成为瓶颈而其他分区空闲。
+
+.. code-block:: text
+
+   存在分区冲突的地址访问模式:
+
+   线程访问: A[0], A[32], A[64], A[96], ...
+       每个地址相差 32 个字 (128 字节 = 一个缓存行)
+       → 所有地址映射到同一个 L2 分区
+       → 该分区带宽饱和度 ~100%, 其他分区利用率 ~30%
+
+   避免分区冲突的技巧:
+
+   1. 向地址加上一个偏移量，使地址范围跨越多个分区
+   2. 使用大页面 (2MB 而非 64KB) 改变地址到分区的映射
+   3. 利用 Hopper 架构改进的 L2 分区均衡
+
+.. code-block:: cuda
+
+   // Partition camping 示例：跨步访问导致所有线程命中同一 L2 分区
+   __global__ void partition_camped(float* data, int N) {
+       int idx = threadIdx.x;
+       // data[0], data[32], data[64], ... → 同一分区
+       float val = data[idx * 32];
+   }
+
+Persisting L2 Cache (Hopper)
+=====================================
+
+Hopper 架构引入了 L2 缓存持久化功能，允许将部分 L2 缓存分配给特定的内存区域，确保该区域的数据不被其他流冲刷：
+
+.. code-block:: cuda
+   :linenos:
+
+   // 持久化 L2 分区
+   cudaDeviceSetLimit(cudaLimitPersistingL2CacheSize, 10 * 1024 * 1024);  // 10 MB
+
+   // 设置流的持久化窗口
+   cudaStreamAttrValue attr;
+   attr.accessPolicyWindow.base_ptr = d_data;
+   attr.accessPolicyWindow.num_bytes = N * sizeof(float);
+   attr.accessPolicyWindow.hitRatio  = 1.0;  // 100% 命中
+   cudaStreamSetAttribute(stream, cudaStreamAttributeAccessPolicyWindow, &attr);
+
+   // 该流中的 kernel 数据会持久驻留在 L2 中
+   kernel<<<grid, block, 0, stream>>>(d_data, N);
+
+**适用场景**: Transformer 中的注意力矩阵、卷积权重、频繁重用的查找表。
+
+缓存行填充与 Sector
+============================
+
+GPU 的缓存行大小为 **128 字节**，但读写最小单元是 **32 字节扇区（sector）**。当 warp 只需要 4 字节数据时，硬件也会读取整个 sector（32 字节），造成带宽浪费：
+
+.. code-block:: text
+
+   Warp 访问 4 字节/线程 → 共同覆盖 128 字节范围
+   硬件操作:
+   1. 检查地址范围覆盖了几个 sector
+   2. 每个 sector 发送一次内存事务
+   3. 合并后的内存事务数 = 覆盖的 sector 数
+
+   Sector 命中率优化:
+   - 合并访问的 warp 覆盖 128 字节 = 4 sectors = 1 个内存事务
+   - 步长 8 的 warp 覆盖 1024 字节 = 32 sectors = 8 个内存事务
+   - 随机访问覆盖 N 个缓存行 = N × 4 sectors
+
+内存延迟隐藏
+=================
+
+GPU 通过线程级并行来隐藏内存访问的长延迟（200-800 周期），而不是依赖于大缓存：
+
+.. code-block:: text
+
+   延迟隐藏条件:
+   所需活跃 warp 数 = 内存延迟 (周期) / 发射间隔 (周期)
+
+   以 Ampere 为例:
+   - 全局内存延迟: ~400 周期
+   - 每 warp 发射间隔: 4 周期 (2 周期发射 + 2 周期流水线)
+   - 所需最少 warp: 400 / 4 = 100 个 warp
+
+   每 SM 最大 warp 数: 64 (Ampere)
+   → 单靠 warp 不足完全隐藏延迟
+   → 需要考虑缓存命中率、计算密度协作
+
+.. code-block:: text
+
+   计算密集型 (compute-bound):  计算时间 > 访存延迟 → 延迟不敏感
+   访存密集型 (memory-bound):  访存延迟 > 计算时间 → 需要高占用率
 
 参考与拓展阅读
 ====================

@@ -6,7 +6,7 @@
 
    If I have seen further it is by standing on the shoulders of Giants.
 
-   — Isaac Newton, 物理学家、数学家
+   — Isaac Newton
 
 - NVIDIA Corporation. *CUDA C++ Programming Guide*. 2024.
   https://docs.nvidia.com/cuda/cuda-c-programming-guide/

@@ -6,7 +6,7 @@ GPU 驱动架构
 
    Talk is cheap. Show me the code.
 
-   — Linus Torvalds, Linux 创始人
+   — Linus Torvalds
 
 现代 GPU 驱动程序采用**用户态驱动（User-Mode Driver, UMD）** 和**内核态驱动（Kernel-Mode Driver, KMD）** 的分层设计。这种分离在保证安全性的同时提供了高性能。
 

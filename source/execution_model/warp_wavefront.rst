@@ -6,7 +6,7 @@ Warp 与 Wavefront
 
    One of my most productive days was throwing away 1,000 lines of code.
 
-   — Ken Thompson, 图灵奖得主、UNIX 联合创始人
+   — Ken Thompson
 
 Warp 是 NVIDIA GPU 最基本的硬件调度单位，AMD GPU 中的对应概念为 Wavefront。
 
@@ -98,6 +98,8 @@ Warp 调度策略
 
 Warp 发散（Warp Divergence）
 ===============================
+
+上一节我们提到了 warp 调度器的"就绪"状态——当 warp 内所有线程都沿着同一路径执行时，调度器可以顺利发射下一条指令。但现实中的程序充满条件分支，当 warp 内的线程面临不同的执行路径时，就发生了 warp 发散。
 
 SIMT 栈管理
 -----------------
@@ -242,7 +244,7 @@ AMD GPU 的 Wavefront 大小为 **64 个线程**，比 warp 大两倍。这意�
 Warp 级原语
 ===============
 
-CUDA 提供一系列 warp 级指令，允许 warp 内线程直接交换数据：
+理解了 warp 的集体执行特性后，CUDA 提供的一系列 warp 级指令就变得非常自然——这些指令允许 warp 内线程直接交换数据，而不需要通过共享内存和同步操作。这就像同一小组的成员可以直接对话，而不必每次都要写便签贴在公告板上。
 
 .. code-block:: cuda
    :linenos:

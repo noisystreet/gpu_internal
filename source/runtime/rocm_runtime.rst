@@ -6,7 +6,7 @@ ROCm Runtime
 
    The important thing is not to stop questioning. Curiosity has its own reason for existing.
 
-   — Albert Einstein, 物理学家、诺贝尔奖得主
+   — Albert Einstein
 
 ROCm（Radeon Open Compute）是 AMD 推出的开源 GPU 计算平台。HIP（Heterogeneous Interface for Portability）是 ROCm 的核心编程模型，提供与 CUDA 高度相似的 API，支持在 NVIDIA 和 AMD GPU 之间便捷移植。
 
@@ -125,13 +125,75 @@ ROCm 使用多层编译：
        |
    硬件执行
 
-关键编译器工具:
+hipcc 编译与 hipify 迁移
+================================
 
-- **hipcc**: HIP 编译驱动，自动处理 ``hipLaunchKernelGGL`` 等核心语法
-- **hipify-perl**: 将 CUDA 代码自动转换为 HIP 代码的工具
-- **ROCm-Device-Libs**: AMD GPU 内置函数和设备端库
+**hipcc 编译命令**:
 
-与 CUDA 的关键差异
+.. code-block:: bash
+
+   # 编译 HIP 程序到 AMD GPU
+   hipcc -o saxpy saxpy.cpp
+
+   # 指定目标 GPU 架构
+   hipcc --offload-arch=gfx942 -o saxpy saxpy.cpp   # MI300X
+   hipcc --offload-arch=gfx90a -o saxpy saxpy.cpp   # MI250X
+
+   # 调试模式
+   hipcc -g -O0 -o saxpy saxpy.cpp
+
+**hipify-perl: CUDA 到 HIP 的自动迁移**:
+
+.. code-block:: bash
+
+   # CUDA 源码 → HIP 源码 自动转换
+   hipify-perl vector_add.cu > vector_add.hip.cpp
+
+   # 包含 CUDA 头文件的目录
+   hipify-perl --cuda-path=/usr/local/cuda vector_add.cu
+
+   # 检查 hipify 报告
+   hipify-perl --print-stats vector_add.cu
+
+.. code-block:: text
+
+   hipify 转换示例:
+   cudaMalloc(&d_a, size)    → hipMalloc(&d_a, size)
+   cudaMemcpyAsync(...)      → hipMemcpyAsync(...)
+   cudaDeviceSynchronize()   → hipDeviceSynchronize()
+   __syncthreads()           → __syncthreads() (保持不变)
+
+**hipLaunchKernelGGL 语法**:
+
+当 CUDA 的 ``<<<>>>`` 语法在 C++ 模板代码中受限时，HIP 提供了等价的函数式调用：
+
+.. code-block:: cpp
+
+   // CUDA 风格
+   saxpy<<<gridSize, blockSize, 0, stream>>>(2.0f, d_x, d_y, N);
+
+   // 等效的 HIP 风格
+   hipLaunchKernelGGL(saxpy, gridSize, blockSize, 0, stream, 2.0f, d_x, d_y, N);
+
+性能分析工具：rocprof
+=========================
+
+ROCm 提供 ``rocprof`` 用于 Profiling HIP 程序：
+
+.. code-block:: bash
+
+   # 基础性能分析
+   rocprof --stats ./saxpy
+
+   # 跟踪 kernel 和 API 调用
+   rocprof --trace hipMemcpy,hipMalloc ./saxpy
+
+   # 输出硬件计数器
+   rocprof --hsa-trace --stats ./saxpy
+
+   # 结果输出: results.csv / results.stats.csv
+
+ROCm 与 CUDA 的差异详解
 =========================
 
 .. list-table::

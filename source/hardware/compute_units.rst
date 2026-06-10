@@ -6,7 +6,7 @@
 
    The principle of "divide and conquer" — when you have a large and complex system, break it into smaller independent pieces that can be worked on separately.
 
-   — John von Neumann, 数学家、计算机科学家
+   — John von Neumann
 
 流多处理器（Streaming Multiprocessor, SM）是 NVIDIA GPU 的核心计算单元，AMD GPU 中对应的概念称为计算单元（Compute Unit, CU）。理解 SM/CU 的内部结构是掌握 GPU 性能调优的基础。
 
@@ -241,6 +241,8 @@ CUDA core 本质上是经过优化的流水线化 ALU，其核心执行路径如
    Ampere 架构中，每个 warp 调度器每周期发射一条指令到其关联 subcore，
    4 个 subcore 并行，每周期最多 4 条 warp 指令被发射执行。
 
+理解了 CUDA Core 如何执行标量运算，我们自然会问：对于深度学习中的大规模矩阵运算，是否可以用更高效的方式实现？答案就是 Tensor Core——专为矩阵乘法累加设计的专用硬件单元。
+
 **Tensor Core（张量核心）**
     专为矩阵乘法累加（MMA）操作设计的专用硬件单元。与 CUDA Core 执行标量运算不同，Tensor Core 在 warp 级别执行**矩阵分块乘加**操作，单条指令完成一个子矩阵的 ``D = A * B + C``。
 
@@ -463,6 +465,8 @@ Hopper 架构引入了几项重要改进：
 
 **加载/存储单元（LD/ST）**
     处理全局内存和共享内存的加载/存储指令，负责地址生成和内存合并。
+
+了解完 NVIDIA 的 CUDA Core 和 Tensor Core 之后，我们再来看 AMD 的对应设计。尽管 AMD 的 Compute Unit 在整体功能上对标 SM，但其内部架构和线程模型有显著不同。
 
 AMD Compute Unit (CU) 结构
 ===============================

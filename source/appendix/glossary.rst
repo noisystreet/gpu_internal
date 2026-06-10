@@ -6,7 +6,7 @@
 
    Language is the road map of a culture. It tells you where its people come from and where they are going.
 
-   — Rita Mae Brown, 作家
+   — Rita Mae Brown
 
 .. glossary::
 

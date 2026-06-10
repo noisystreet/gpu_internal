@@ -6,7 +6,7 @@ Kernel 执行模型
 
    We can only see a short distance ahead, but we can see plenty there that needs to be done.
 
-   — Alan Turing, 计算机科学之父
+   — Alan Turing
 
 Kernel 是在 GPU 上执行的函数。GPU 采用 **SIMT（Single Instruction, Multiple Threads）** 执行模型，即同一条指令由多个线程在不同的数据上执行。
 

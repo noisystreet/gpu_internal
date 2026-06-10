@@ -6,7 +6,7 @@
 
    For a successful technology, reality must take precedence over public relations, for nature cannot be fooled.
 
-   — Richard Feynman, 物理学家、诺贝尔奖得主
+   — Richard Feynman
 
 GPU 的内存层次结构是理解和优化 GPU 程序性能的关键。与 CPU 类似，GPU 也采用多级存储层次，但容量和带宽的取舍更加极端。
 
@@ -25,12 +25,16 @@ GPU 的内存层次结构是理解和优化 GPU 程序性能的关键。与 CPU 
       |       ~16-80 GB，带宽 ~2 TB/s
       v
    主机内存 (CPU DRAM)
-              ~64-512 GB，带宽 ~50 GB/s (PCIe 4.0 x16)
+             ~64-512 GB，带宽 ~50 GB/s (PCIe 4.0 x16)
+
+.. note::
+
+   这提醒我们一个重要的优化原则：距离 ALU 越近的存储器速度越快、容量越小。将频繁使用的数据放在共享内存或寄存器中，可以比全局内存访问快一到两个数量级。
 
 全局显存（Global Memory）
 =============================
 
-全局显存是 GPU 上最大的存储空间，也是主机和设备之间数据传输的主要对象。
+全局显存是 GPU 上最大的存储空间，也是主机和设备之间数据传输的主要对象。它是理解 GPU 带宽瓶颈的起点。如果把 GPU 芯片比作一座繁忙的城市，全局显存就是城市边缘的大型仓库——容量大但距离远，每次取货需要经历漫长的运输。
 
 - **容量**: 通常 4-80 GB
 - **带宽**: HBM2e 可达 ~2 TB/s，GDDR6X 可达 ~1 TB/s

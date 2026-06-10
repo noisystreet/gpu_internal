@@ -6,7 +6,7 @@
 
    It is not the strongest of the species that survives, nor the most intelligent, but the one most responsive to change.
 
-   — Charles Darwin, 自然选择理论奠基人
+   — Charles Darwin
 
 在多 GPU 系统中，GPU 之间的连接拓扑直接决定了通信性能和编程模型。了解并利用拓扑信息可以显著提升多 GPU 应用程序的性能。
 
@@ -184,11 +184,11 @@ NCCL (NVIDIA Collective Communications Library) 内置拓扑感知能力：
 NCCL 通信算法深入
 =========================
 
-NCCL（NVIDIA Collective Communications Library）是 NVIDIA 的 GPU 集合通信库，实现了多种通信算法以适应不同的拓扑和场景。
+NCCL（NVIDIA Collective Communications Library）是 NVIDIA 的 GPU 集合通信库，实现了多种通信算法以适应不同的拓扑和场景。理解这些算法的工作原理，有助于在分布式训练和多 GPU 编程中选择最合适的通信策略。
 
 **Ring AllReduce**
 
-Ring AllReduce 将 N 个 GPU 连接成逻辑环，分为 scatter-reduce 和 allgather 两个阶段：
+Ring AllReduce 是最广泛使用的通信算法之一。它将 N 个 GPU 连接成逻辑环，分为 scatter-reduce 和 allgather 两个阶段：
 
 .. math::
 
