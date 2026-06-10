@@ -130,7 +130,7 @@ Kernel 同步机制
 深入同步原语
 =================
 
-**Warp 级同步: ``__syncwarp()``**
+Warp 级同步：``__syncwarp()``
 
 ``__syncwarp()`` 是 warp 内的轻量级同步屏障，只同步同一 warp 内的 32 个线程。它比 ``__syncthreads()`` 开销低得多，因为不涉及跨 warp 的通信。
 

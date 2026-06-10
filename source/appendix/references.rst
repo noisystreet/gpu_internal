@@ -46,3 +46,33 @@
 - L. Durant et al. *NVIDIA Volta Architecture*. IEEE Micro, 2018.
 - A. Vega et al. *AMD CDNA 2 Architecture*. HPCA 2023.
 - V. Mendoza et al. *Understanding GPU Page Migration*. IISWC 2022.
+- John L. Hennessy, David A. Patterson. *Computer Architecture: A Quantitative Approach*. 6th ed., Morgan Kaufmann, 2017.
+- NVIDIA Corporation. *NVIDIA CUDA Installation Guide for Linux*. 2024.
+  https://docs.nvidia.com/cuda/cuda-installation-guide-linux/
+- AMD Corporation. *AMD Instinct MI300X Datasheet*. 2023.
+  https://www.amd.com/en/products/accelerators/instinct/mi300x.html
+- Intel Corporation. *Intel Data Center GPU Max Series Architecture*. 2023.
+  https://www.intel.com/content/www/us/en/products/docs/arc/software-library.html
+- Khronos Group. *SPIR-V Specification*. 2024.
+  https://registry.khronos.org/SPIR-V/
+- NVIDIA Corporation. *GPU Direct RDMA Documentation*. 2024.
+  https://docs.nvidia.com/cuda/gpudirect-rdma/
+- J. Nickolls, I. Buck, M. Garland, K. Skadron. *Scalable Parallel Programming with CUDA*. ACM Queue, 2008.
+- S. W. Keckler, W. J. Dally, B. Khailany, M. Garland, D. Glasco. *GPUs and the Future of Parallel Computing*. IEEE Micro, 2011.
+- M. Garland et al. *Parallel Computing Experiences with CUDA*. IEEE Micro, 2008.
+- AMD Corporation. *ROCm Profiling Tools (rocprof) Documentation*. 2024.
+  https://rocm.docs.amd.com/projects/rocprofiler/
+- Intel Corporation. *Intel oneAPI Level Zero Specification*. 2024.
+  https://spec.oneapi.io/level-zero/latest/
+- Khronos Group. *Vulkan Memory Model*. 2022.
+  https://www.khronos.org/blog/understanding-vulkan-memory-model
+- James Reinders, Ben Ashbaugh, James Brodman, et al. *Data Parallel C++: Mastering DPC++ for Programming Heterogeneous Systems*. Apress, 2020.
+- Massimiliano Fasi, Nicholas J. Higham, Mantas Mikaitis, Srikara Pranesh. *Numerical Behavior of NVIDIA Tensor Cores*. PeerJ Computer Science, 7:e330, 2021.
+  https://peerj.com/articles/cs-330/
+- Wei Sun, Ang Li, Tong Geng, Sander Stuijk, Henk Corporaal. *Dissecting Tensor Cores via Microbenchmarks: Latency, Throughput and Numeric Behaviors*. arXiv:2206.02874, 2022.
+  https://arxiv.org/abs/2206.02874
+- Stefano Markidis, Steven W. D. Chien, Erwin Laure, Jeffrey S. Vetter. *NVIDIA Tensor Core Programmability, Performance & Precision*. IPDPSW, 2018.
+- Hiroyuki Ootomo, Rio Yokota. *Recovering Single Precision Accuracy from Tensor Cores While Surpassing the FP32 Theoretical Peak Performance*. IJHPCA, 36(4), 2022.
+- Hamdy Abdelkhalik, Yehia Arafa, Nandakishore Santhi, Abdel-Hameed Badawy. *Demystifying the Nvidia Ampere Architecture through Microbenchmarking and Instruction-level Analysis*. arXiv:2208.11174, 2022.
+  https://arxiv.org/abs/2208.11174
+- Benjamin Valpey, Sreepathi Pai. *A Formal Specification of Tensor Cores via Satisfiability Modulo Theories*. SC23 Poster, 2023.

@@ -265,15 +265,26 @@ Warp 级原语
        }
    }
 
-常用 warp 级函数:
+常用 warp 级函数可分为几个功能类别：
 
-- ``__shfl_sync(mask, var, srcLane)`` — 从指定 lane 获取值
-- ``__shfl_up_sync(mask, var, delta)`` — 从 lane - delta 获取值
-- ``__shfl_down_sync(mask, var, delta)`` — 从 lane + delta 获取值
-- ``__ballot_sync(mask, predicate)`` — 收集线程的谓词值到 32 位掩码
-- ``__all_sync(mask, predicate)`` — 若所有线程 predicate 为真，返回真
-- ``__any_sync(mask, predicate)`` — 若任一线程 predicate 为真，返回真
-- ``__popc(mask)`` — 统计 32 位掩码中的 1 的个数
+**数据交换（Shuffle）**：允许 warp 内线程直接读写其他线程的寄存器值：
+
+- ``__shfl_sync(mask, var, srcLane)`` — 从指定 lane 获取值。适用于取邻接数据，如每个线程从其左邻获取结果
+- ``__shfl_up_sync(mask, var, delta)`` — 从 ``lane - delta`` 获取值。常用于前缀和（prefix sum）等自左向右的传播操作
+- ``__shfl_down_sync(mask, var, delta)`` — 从 ``lane + delta`` 获取值。常用于规约（reduction）等自右向左的汇聚
+
+**线程投票（Vote）**：收集 warp 内线程的布尔状态：
+
+- ``__ballot_sync(mask, predicate)`` — 收集 32 个线程的谓词值，打包为一个 32 位整型。每一位代表一个线程的 true/false，是 warp 发散分析和自适应算法的核心工具
+- ``__all_sync(mask, predicate)`` — 若 **所有** 活跃线程的 predicate 均为真，返回真。等价于 ``__ballot_sync(mask, predicate) == mask``
+- ``__any_sync(mask, predicate)`` — 若 **任意** 活跃线程的 predicate 为真，返回真。可用于提前退出或快速收敛
+- ``__popc(mask)`` — 统计 32 位掩码中 1 的个数，即活跃线程数。配合 ``__ballot_sync`` 可实现在不知道活跃线程数量的情况下动态调整算法
+
+**选择建议**：
+
+- 需要 warp 内数据共享时，优先使用 ``__shfl_*_sync`` 而非共享内存，延迟更低（约 5 周期 vs 30 周期）
+- ``__ballot_sync`` 的 ``mask`` 参数应传 ``__activemask()``，确保仅作用于当前活跃的 lane
+- Volta+ 架构要求显式传入 ``mask`` 参数（相比前代的隐式 mask 更明确但更复杂）
 
 参考与拓展阅读
 ====================
