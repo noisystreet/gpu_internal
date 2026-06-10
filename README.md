@@ -1,6 +1,10 @@
 # 深入理解 GPU
 
+[![Documentation Status](https://readthedocs.org/projects/gpu-internal/badge/?version=latest)](https://gpu-internal.readthedocs.io/zh-cn/latest/)
+
 系统化的 GPU 底层原理教程，使用 reStructuredText 编写，通过 Sphinx 构建为 HTML/PDF。
+
+在线文档：https://gpu-internal.readthedocs.io/zh-cn/latest/
 
 ## 内容
 
