@@ -35,7 +35,14 @@ gpu_internal/
     │   ├── index.rst
     │   ├── architecture.rst
     │   ├── memory_hierarchy.rst
-    │   └── compute_units.rst
+    │   ├── sm_architecture.rst
+    │   ├── cuda_core.rst
+    │   ├── tensor_core_architecture.rst
+    │   ├── tensor_core_wmma_vs_mma.rst
+    │   ├── tensor_core_numerical.rst
+    │   ├── tensor_core_precision.rst
+    │   ├── amd_cu.rst
+    │   └── occupancy.rst
     ├── execution_model/      # 执行模型
     │   ├── index.rst
     │   ├── kernel.rst
