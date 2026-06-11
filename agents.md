@@ -37,6 +37,7 @@ gpu_internal/
     │   ├── memory_hierarchy.rst
     │   ├── sm_architecture.rst
     │   ├── cuda_core.rst
+    │   ├── sfu.rst
     │   ├── tensor_core_architecture.rst
     │   ├── tensor_core_wmma_vs_mma.rst
     │   ├── tensor_core_numerical.rst

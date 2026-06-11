@@ -9,6 +9,7 @@
    memory_hierarchy
    sm_architecture
    cuda_core
+   sfu
    tensor_core_architecture
    tensor_core_wmma_vs_mma
    tensor_core_numerical
@@ -22,6 +23,7 @@
 - :doc:`memory_hierarchy`
 - :doc:`sm_architecture`
 - :doc:`cuda_core`
+- :doc:`sfu`
 - :doc:`tensor_core_architecture`
 - :doc:`tensor_core_wmma_vs_mma`
 - :doc:`tensor_core_numerical`
