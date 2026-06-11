@@ -52,7 +52,9 @@ gpu_internal/
     ├── driver/               # 驱动
     │   ├── index.rst
     │   ├── architecture.rst
-    │   └── communication.rst
+    │   ├── firmware.rst
+    │   ├── communication.rst
+    │   └── driver_open_source.rst
     ├── runtime/              # 运行时
     │   ├── index.rst
     │   ├── cuda_runtime.rst
