@@ -4,9 +4,9 @@ GPU 全栈层次概览
 
 .. epigraph::
 
-   Simplicity is prerequisite for reliability.
+   Science is what we understand well enough to explain to a computer. Art is everything else we do.
 
-   — Edsger W. Dijkstra
+   — Donald Knuth
 
 一次 GPU 计算操作从应用程序到硬件执行，经过多个软件和硬件层次。理解这些层次有助于定位性能瓶颈和理解系统行为。
 

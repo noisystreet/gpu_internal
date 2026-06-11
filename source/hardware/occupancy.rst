@@ -27,5 +27,6 @@
 参考与拓展阅读
 ====================
 
-- CUDA C++ Programming Guide (https://docs.nvidia.com/cuda/cuda-c-programming-guide/) — 占用率计算器官方说明
+- 深入理解 :doc:`sm_architecture` — SM Subcore 和寄存器文件
+- 深入理解 :doc:`cuda_core` — 寄存器使用和指令吞吐
 - CUDA C++ Best Practices Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/) — 占用率分析和寄存器优化

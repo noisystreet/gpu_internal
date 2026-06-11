@@ -136,5 +136,7 @@ SM 内部被划分为多个 ``subcore``（也称分区、处理块），每个 `
 参考与拓展阅读
 ====================
 
+- 深入理解 :doc:`cuda_core` — CUDA Core 流水线和指令吞吐
+- 深入理解 :doc:`occupancy` — 占用率对性能的影响
 - CUDA C++ Programming Guide (https://docs.nvidia.com/cuda/cuda-c-programming-guide/) — SM 架构的官方说明
 - Dissecting the Ampere GPU Architecture via Microbenchmarking (https://arxiv.org/abs/2202.00517) — SM 指令级微基准测试

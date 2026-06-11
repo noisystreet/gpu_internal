@@ -246,6 +246,7 @@ GPU 虚拟化技术处于快速发展中，几个值得关注的趋势：
 参考与拓展阅读
 ====================
 
-- NVIDIA Multi-Instance GPU User Guide (https://docs.nvidia.com/datacenter/tesla/mig-user-guide/) — NVIDIA MIG 用户指南
-- CUDA Multi-Process Service (https://docs.nvidia.com/deploy/mps/) — CUDA Multi-Process Service 文档
-- CUDA C++ Best Practices Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/) — GPU 虚拟化场景下的性能调优建议
+- 深入理解 :doc:`mig` — NVIDIA MIG 硬件分区技术
+- 深入理解 :doc:`sr_iov` — SR-IOV 和 vGPU 虚拟化
+- NVIDIA vGPU Documentation (https://docs.nvidia.com/grid/) — NVIDIA vGPU 技术文档
+- CUDA Multi-Process Service (https://docs.nvidia.com/deploy/mps/) — CUDA MPS 文档

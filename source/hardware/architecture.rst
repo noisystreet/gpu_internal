@@ -263,8 +263,8 @@ GPU 芯片内部各个组件之间通过片上网络（Network-on-Chip, NoC）�
 参考与拓展阅读
 ====================
 
-- Dissecting the Ampere GPU Architecture via Microbenchmarking (https://arxiv.org/abs/2202.00517) — 通过微基准测试分析 Ampere 芯片布局和内存延迟
-- NVIDIA H100 Tensor Core GPU Architecture (https://www.nvidia.com/en-us/data-center/h100/) — NVIDIA Hopper 架构白皮书
-- NVIDIA Volta Architecture - IEEE Micro 2018 — Volta 架构微架构分析
-- AMD CDNA 3 Architecture Whitepaper (https://www.amd.com/en/products/accelerators/instinct/cdna-3.html) — AMD CDNA 3 架构详细规格
-- AMD CDNA 2 Architecture - HPCA 2023 — CDNA 2 Chiplet 设计分析
+- 深入理解 :doc:`sm_architecture` — SM 内部结构和 Subcore
+- 深入理解 :doc:`memory_hierarchy` — 缓存和显存层次详解
+- NVIDIA H100 Tensor Core GPU Architecture (https://www.nvidia.com/en-us/data-center/h100/) — Hopper 架构官方白皮书
+- Dissecting the Ampere GPU Architecture via Microbenchmarking (https://arxiv.org/abs/2202.00517) — 通过微基准测试分析 Ampere 芯片布局
+- AMD CDNA 3 Architecture Whitepaper (https://www.amd.com/en/products/accelerators/cdna-3.html) — AMD CDNA 3 架构详细规格

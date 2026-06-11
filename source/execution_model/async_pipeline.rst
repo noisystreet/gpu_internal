@@ -375,6 +375,8 @@ GPU 内部有多个独立的硬件引擎，可以并行执行不同类型的操�
 参考与拓展阅读
 ====================
 
+- 深入理解 :doc:`../runtime/cuda_runtime` — CUDA Stream 和 Event 编程
+- 深入理解 :doc:`../execution_model/warp_wavefront` — Warp 调度和指令发射
 - CUDA C++ Programming Guide (https://docs.nvidia.com/cuda/cuda-c-programming-guide/) — CUDA 流、异步拷贝和 cuda::pipeline 的完整 API 参考
 - CUDA C++ Best Practices Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/) — 异步操作重叠的最佳实践
 - Parallel Thread Execution ISA (https://docs.nvidia.com/cuda/parallel-thread-execution/) — cp.async 指令的硬件级规范

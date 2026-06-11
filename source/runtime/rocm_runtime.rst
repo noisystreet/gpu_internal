@@ -221,6 +221,7 @@ ROCm 与 CUDA 的差异详解
 参考与拓展阅读
 ====================
 
-- AMD ROCm Documentation (https://rocm.docs.amd.com/) — ROCm 完整文档和 HIP 编程指南
+- 深入理解 :doc:`cuda_runtime` — CUDA Runtime 与 HIP 的对比参考
+- 深入理解 :doc:`../execution_model/kernel` — Kernel 启动和执行模型
 - AMD CDNA 3 Architecture Whitepaper (https://www.amd.com/en/products/accelerators/instinct/cdna-3.html) — AMD CDNA 3 架构白皮书
 - Programming Massively Parallel Processors - Kirk & Hwu (4th ed.) — 第 13 章介绍 HIP 和多平台 GPU 编程

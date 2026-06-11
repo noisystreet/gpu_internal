@@ -96,5 +96,6 @@ Sun 等人（2022）通过微基准测试测得的 Tensor Core 指令性能：
 参考与拓展阅读
 ====================
 
-- Dissecting Tensor Cores via Microbenchmarks (https://arxiv.org/abs/2206.02874) — 指令延迟和吞吐分析
+- 深入理解 :doc:`tensor_core_architecture` — Tensor Core 工作原理
+- 深入理解 :doc:`tensor_core_numerical` — 数值行为分析
 - Demystifying Nvidia Ampere Architecture (https://arxiv.org/abs/2208.11174) — 指令周期测量

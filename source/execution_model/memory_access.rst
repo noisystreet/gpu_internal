@@ -250,9 +250,125 @@ GPU 通过线程级并行来隐藏内存访问的长延迟（200-800 周期）�
    计算密集型 (compute-bound):  计算时间 > 访存延迟 → 延迟不敏感
    访存密集型 (memory-bound):  访存延迟 > 计算时间 → 需要高占用率
 
+Roofline 性能模型
+======================
+
+Roofline 模型是将计算吞吐和内存带宽统一在一个坐标系中的性能分析方法。它回答了 GPU 性能分析中最关键的问题——**当前 kernel 是被计算能力限制还是被内存带宽限制**。
+
+**Roofline 模型的基本形式**：
+
+.. code-block:: text
+
+   性能 (FLOPS)
+       ↑
+   FP32 峰值  ────────────────────────┐
+   (H100: 67 TFLOPS)                   │ 计算受限区
+                                       │ (compute-bound)
+       │                               │
+       │                      ┌────────┘
+       │               ○ ← 你的 kernel
+       │              /
+       │             /
+       │            /
+       │           /
+   内存带宽  ─────┼────────────── 访存受限区
+   (2 TB/s)       │               (memory-bound)
+       │          │
+       └──────────┴────────────────────────→
+                 算术强度 (FLOPS/Byte)
+                 ridge point
+
+**核心指标：算术强度（Arithmetic Intensity）**
+
+算术强度 = 总 FLOPS / 总内存流量（Byte），单位 FLOPS/Byte。它是判断 kernel 性质的关键：
+
+.. code-block:: text
+
+   算术强度 > ridge point → compute-bound（计算受限）
+   算术强度 < ridge point → memory-bound（访存受限）
+
+   典型 kernel 的算术强度:
+   kernel                          FLOPS   内存流量   算术强度   bound 类型
+   ─────────────────────────────────────────────────────────────────
+   Vector Add (1:1)              1 op      12 Byte    0.08      内存
+   SAXPY (y = a*x + y)           2 ops     16 Byte    0.125     内存
+   GEMM (M=N=K=4096, FP32)        ~2T ops   ~96 MB    ~20000    计算
+   Convolution (3x3, FP16)        ~50M ops  ~1 MB     ~50       计算
+   Softmax (N=1024)              ~5K ops   ~8 KB     ~0.6      内存
+   Attention (N=4096, head=64)   ~2M ops   ~128 KB   ~15       较均衡
+
+**使用 Nsight Compute 获取 Roofline 数据**：
+
+.. code-block:: bash
+
+   # Nsight Compute 的 Roofline 分析
+   ncu --set full --roofline-only ./my_kernel
+
+   # 输出内容
+   # - Kernel 的算术强度 (FLOPS/Byte)
+   # - 理论峰值 FLOPS
+   # - 理论峰值带宽
+   # - Roofline 图表位置
+
+   # 不依赖工具的快速估算:
+   # nvprof / nsys 可获取 kernel 的 duration 和 memory traffic
+   # nsys profile --stats=true ./my_app
+   # 计算: FLOPS ≈ (总运算量) / (duration)
+   #       带宽 ≈ (总内存流量) / (duration)
+   #       算术强度 = FLOPS / 带宽
+
+**Roofline 分析的实践步骤**：
+
+.. code-block:: text
+
+   1. 确定 kernel 的总运算量（FLOPS）
+      矩阵乘法 MxK × KxN: 2 × M × N × K FLOPS
+      逐元素操作: N 个线程 × 1 FMA/线程
+
+   2. 确定 kernel 的总内存流量（Byte）
+      输入 + 输出 + 中间结果（排除 L1/L2 命中部分）
+
+   3. 计算算术强度 = FLOPS / Byte
+
+   4. 与 ridge point 比较
+      ridge point = 峰值带宽 / 峰值 FLOPS
+      H100 SXM: 2 TB/s ÷ 67 TFLOPS ≈ 30 FLOPS/Byte
+
+   5. 判定瓶颈并优化:
+      memory-bound → 优化内存访问模式（合并访问、缓存复用）
+      compute-bound → 优化计算策略（Tensor Core、降低精度）
+
+**如何缓解 memory-bound**：
+
+.. code-block:: text
+
+   策略                    预期收益      代价
+   ────────────────────────────────────────────
+   合并访问                 2-10x        代码重构
+   共享内存 tile 化          2-5x         共享内存使用量增加
+   L1/共享内存配置           ~20%         需要 tune
+   预取 (Prefetch)           1.5-3x       增加代码复杂度
+   降低精度 (FP16/BF16)      2x           精度损失
+   增大 tile 尺寸            1.5-3x       寄存器压力增加
+   使用向量化加载 (float4)   1.5-2x        边界处理复杂
+
+**如何缓解 compute-bound**：
+
+.. code-block:: text
+
+   策略                    预期收益      代价
+   ────────────────────────────────────────────
+   使用 Tensor Core         5-10x       需要 FP16/BF16/TF32
+   降低精度                 2-4x         精度损失
+   减少寄存器溢出           1.5-3x       修改 kernel 参数
+   ILP (指令级并行)         1.5-2x       展开循环、增加寄存器
+   使用 CUDA Graph          2-5x         减少启动开销
+
 参考与拓展阅读
 ====================
 
 - CUDA C++ Programming Guide (https://docs.nvidia.com/cuda/cuda-c-programming-guide/) — CUDA 编程指南中关于内存合并访问的详细说明
+- 深入理解 :doc:`../execution_model/warp_wavefront` — Warp 内存访问模式
+- 深入理解 :doc:`../hardware/memory_hierarchy` — 存储层次结构
 - CUDA C++ Best Practices Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/) — 最佳实践指南中的内存优化章节
 - Dissecting the Ampere GPU Architecture via Microbenchmarking (https://arxiv.org/abs/2202.00517) — 通过微基准测试分析 Ampere 内存子系统

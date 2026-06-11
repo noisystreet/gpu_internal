@@ -292,6 +292,7 @@ AMD 的集合通信库，与 NCCL API 兼容：
 ====================
 
 - NVIDIA NCCL Documentation (https://docs.nvidia.com/deeplearning/nccl/) — NCCL 完整文档和通信算法实现细节
-- NVIDIA NVLink & NVSwitch (https://www.nvidia.com/en-us/data-center/nvlink/) — NVLink/NVSwitch 拓扑对通信的影响
+- 深入理解 :doc:`nvlink_nvswitch` — NVLink 和 NVSwitch 硬件细节
+- 深入理解 :doc:`cache_coherence` — 一致性对通信的影响
 - CUDA C++ Best Practices Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/) — 多 GPU 通信优化章节
 - CUDA C++ Programming Guide (https://docs.nvidia.com/cuda/cuda-c-programming-guide/) — CUDA 编程指南中 P2P 通信部分

@@ -362,7 +362,9 @@ UVA 是 CUDA 4+ 引入的重要特性，使 CPU 和 GPU 共享同一虚拟地址
 ====================
 
 - CUDA C++ Programming Guide (https://docs.nvidia.com/cuda/cuda-c-programming-guide/) — CUDA 编程指南中的内存层次结构说明
-- CUDA C++ Best Practices Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/) — 内存优化最佳实践
+- 深入理解 :doc:`../execution_model/memory_access` — 内存访问模式和合并访问
+- 深入理解 :doc:`../execution_model/kernel` — 线程块共享内存配置
+- CUDA C++ Best Practices Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/) — 缓存和共享内存优化
 - Dissecting the Ampere GPU Architecture via Microbenchmarking (https://arxiv.org/abs/2202.00517) — Ampere 内存子系统的微基准测试分析
 - Understanding GPU Page Migration - IISWC 2022 — GPU 页迁移机制的深入研究
 - Parallel Thread Execution ISA (https://docs.nvidia.com/cuda/parallel-thread-execution/) — PTX 指令集手册中关于内存访问指令的规范

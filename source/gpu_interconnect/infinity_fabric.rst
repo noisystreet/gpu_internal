@@ -198,6 +198,8 @@ Infinity Fabric vs NVLink 性能对比
 参考与拓展阅读
 ====================
 
+- 深入理解 :doc:`cache_coherence` — AMD Infinity Architecture 缓存一致性协议
+- 深入理解 :doc:`nvlink_nvswitch` — NVIDIA NVLink 对比参考
 - AMD Infinity Architecture (https://www.amd.com/en/products/accelerators/instinct.html) — AMD Infinity Architecture 白皮书
 - AMD ROCm Documentation (https://rocm.docs.amd.com/) — ROCm 中 Infinity Fabric 和统一内存的 API 文档
 - AMD CDNA 3 Architecture Whitepaper (https://www.amd.com/en/products/accelerators/instinct/cdna-3.html) — CDNA 3 Chiplet 互联架构的详细说明

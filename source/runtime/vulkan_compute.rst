@@ -415,6 +415,7 @@ Vulkan 要求开发者显式指定内存访问顺序：
 参考与拓展阅读
 ====================
 
-- Vulkan 1.3 Specification (https://registry.khronos.org/vulkan/specs/1.3/html/) — Vulkan 1.3 规范中计算着色器的完整章节
+- 深入理解 :doc:`../execution_model/warp_wavefront` — Subgroup 与 warp 的对比
+- 深入理解 :doc:`../hardware/cuda_core` — CUDA Core 微架构对比参考
 - CUDA C++ Programming Guide (https://docs.nvidia.com/cuda/cuda-c-programming-guide/) — 与 CUDA 计算模型的对比参考
 - Programming Massively Parallel Processors - Kirk & Hwu (4th ed.) — 第 14 章介绍 OpenCL/Vulkan 计算

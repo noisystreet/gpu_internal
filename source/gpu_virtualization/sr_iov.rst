@@ -4,9 +4,9 @@ SR-IOV 与 vGPU
 
 .. epigraph::
 
-   Any sufficiently advanced technology is indistinguishable from magic.
+   In mathematics, you don't understand things. You just get used to them.
 
-   — Arthur C. Clarke
+   — John von Neumann
 
 SR-IOV（Single Root I/O Virtualization）是一种 PCIe 标准，允许一个物理设备呈现为多个独立的虚拟设备。
 

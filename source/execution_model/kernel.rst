@@ -248,6 +248,8 @@ CUDA 9+ 引入 ``cooperative_groups`` 命名空间，提供灵活的线程分组
 参考与拓展阅读
 ====================
 
-- CUDA C++ Programming Guide (https://docs.nvidia.com/cuda/cuda-c-programming-guide/) — CUDA 编程指南中关于同步和内存栅栏的章节
-- Parallel Thread Execution ISA (https://docs.nvidia.com/cuda/parallel-thread-execution/) — PTX 指令集手册中同步指令的完整说明
-- Programming Massively Parallel Processors - Kirk & Hwu (4th ed.) — 第 4-5 章详细讲解 Kernel 执行模型和线程同步
+- 深入理解 :doc:`../execution_model/warp_wavefront` — Warp 调度机制和分支发散
+- 深入理解 :doc:`../execution_model/memory_access` — 内存访问模式优化
+- 深入理解 :doc:`../execution_model/async_pipeline` — 流并发和异步操作
+- CUDA C++ Best Practices Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/) — CUDA 编程最佳实践指南
+- NVIDIA Nsight Compute (https://docs.nvidia.com/nsight-compute/) — NSight Compute Kernel 分析工具

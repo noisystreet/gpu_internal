@@ -273,6 +273,8 @@ MIG 性能隔离实测数据
 参考与拓展阅读
 ====================
 
+- 深入理解 :doc:`overview` — GPU 虚拟化方案对比
+- 深入理解 :doc:`sr_iov` — SR-IOV 和 MPS 多进程共享
 - NVIDIA Multi-Instance GPU User Guide (https://docs.nvidia.com/datacenter/tesla/mig-user-guide/) — NVIDIA MIG 用户指南，包含所有支持的配置和命令
 - CUDA C++ Best Practices Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/) — MIG 场景下的性能优化建议
 - NVIDIA Nsight Compute (https://docs.nvidia.com/nsight-compute/) — MIG 实例的性能分析工具说明

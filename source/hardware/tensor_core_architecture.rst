@@ -2,7 +2,13 @@
 Tensor Core 工作原理
 ========================
 
-Tensor Core 的操作单位是 **warp（32 线程）**。整个 warp 协作完成一个矩阵分块的乘法累加，而不是每个线程独立运算：
+Tensor Core 的操作单位是 warp（32 线程）。整个 warp 协作完成一个矩阵分块的乘法累加，而不是每个线程独立运算：
+
+.. note::
+
+   在 Volta/Turing/Ampere 架构中，Tensor Core 的操作单位始终是单个 warp（32 线程）。
+   Hopper 架构引入了 warpgroup-level 的 ``wgmma`` 指令，允许 4 个 warp（128 线程）协作完成更大的矩阵分块运算。
+   传统 ``mma.sync`` 指令在 Hopper 上仍以 warp 为操作单位。
 
 .. code-block:: text
 
@@ -64,6 +70,7 @@ Tensor Core 操作在 PTX 指令层面表示为 ``mma.sync``：
 参考与拓展阅读
 ====================
 
+- 深入理解 :doc:`tensor_core_wmma_vs_mma` — WMMA API vs mma API 性能差异
+- 深入理解 :doc:`tensor_core_numerical` — Tensor Core 数值行为和舍入误差
+- 深入理解 :doc:`tensor_core_precision` — 精度配置和适用场景
 - CUDA C++ Programming Guide (https://docs.nvidia.com/cuda/cuda-c-programming-guide/) — mma 指令参考
-- CUTLASS (https://github.com/NVIDIA/cutlass) — NVIDIA 开源 GEMM 模板库
-- cuBLAS / cuDNN — 通过库 API 自动调用 Tensor Core

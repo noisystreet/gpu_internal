@@ -65,5 +65,7 @@ NVIDIA SM vs AMD CU 对比
 参考与拓展阅读
 ====================
 
+- 深入理解 :doc:`sm_architecture` — NVIDIA SM 架构对比
+- 深入理解 :doc:`tensor_core_precision` — Matrix Core 精度对比
 - AMD CDNA 3 Architecture Whitepaper (https://www.amd.com/en/products/accelerators/cdna-3.html)
 - AMD ROCm Documentation (https://rocm.docs.amd.com/) — HIP 编程指南

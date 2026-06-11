@@ -403,6 +403,8 @@ NVLink 链路的功耗可动态调节：
 参考与拓展阅读
 ====================
 
+- 深入理解 :doc:`cache_coherence` — CPU-GPU 缓存一致性
+- 深入理解 :doc:`topology_awareness` — 拓扑感知的通信优化
 - NVIDIA NVLink & NVSwitch (https://www.nvidia.com/en-us/data-center/nvlink/) — NVIDIA NVLink/NVSwitch 技术白皮书
 - NVIDIA NCCL Documentation (https://docs.nvidia.com/deeplearning/nccl/) — NCCL 通信库文档和算法说明
 - CUDA C++ Best Practices Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/) — 多 GPU 通信优化和 P2P 访问

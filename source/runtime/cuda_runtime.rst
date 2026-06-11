@@ -320,6 +320,8 @@ CUDA 工具链
 参考与拓展阅读
 ====================
 
+- 深入理解 :doc:`../driver/communication` — GPU 页错误和统一内存实现
+- 深入理解 :doc:`../execution_model/async_pipeline` — 流同步和 CUDA Graph 深入
 - CUDA C++ Programming Guide (https://docs.nvidia.com/cuda/cuda-c-programming-guide/) — CUDA Runtime API 的完整参考文档
 - CUDA C++ Best Practices Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/) — CUDA 编程最佳实践
 - NVIDIA Nsight Compute (https://docs.nvidia.com/nsight-compute/) — Nsight Compute 性能分析工具使用指南

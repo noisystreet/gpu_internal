@@ -133,6 +133,8 @@ Warp 在 CUDA Core 上的执行
 参考与拓展阅读
 ====================
 
+- 深入理解 :doc:`sm_architecture` — SM 的 Subcore 架构
+- 深入理解 :doc:`sfu` — 特殊函数单元的微架构
 - CUDA C++ Programming Guide (https://docs.nvidia.com/cuda/cuda-c-programming-guide/) — CUDA 核心架构说明
 - CUDA C++ Best Practices Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/) — 指令吞吐优化
 - Dissecting the Ampere GPU Architecture via Microbenchmarking (https://arxiv.org/abs/2202.00517) — 指令级延迟分析

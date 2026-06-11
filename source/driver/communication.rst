@@ -279,6 +279,8 @@ GPU 的 MMU 包含多级 TLB（Translation Lookaside Buffer）。缓存的页表
 参考与拓展阅读
 ====================
 
+- 深入理解 :doc:`../gpu_interconnect/cache_coherence` — CPU-GPU 缓存一致性协议
+- 深入理解 :doc:`architecture` — GPU 驱动 UMD/KMD 分层架构
 - CUDA C++ Programming Guide (https://docs.nvidia.com/cuda/cuda-c-programming-guide/) — CUDA 编程指南中关于统一内存和流同步的章节
 - CUDA C++ Best Practices Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/) — 主机-设备数据传输优化
 - Understanding GPU Page Migration - IISWC 2022 — GPU 页错误和迁移机制的实验分析

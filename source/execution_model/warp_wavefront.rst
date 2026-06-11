@@ -282,6 +282,8 @@ Warp 级原语
 参考与拓展阅读
 ====================
 
+- 深入理解 :doc:`../hardware/occupancy` — 占用率与 warp 调度的关系
+- 深入理解 :doc:`../execution_model/kernel` — 线程块和 Grid 的配置策略
 - Parallel Thread Execution ISA (https://docs.nvidia.com/cuda/parallel-thread-execution/) — PTX 指令集手册中 shfl.sync、vote.sync 等 warp 级指令的完整规范
 - CUDA C++ Programming Guide (https://docs.nvidia.com/cuda/cuda-c-programming-guide/) — CUDA 编程指南中关于 warp 级原语和 Cooperative Groups 的章节
 - CUDA C++ Best Practices Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/) — 分支发散和谓词化的优化策略

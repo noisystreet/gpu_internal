@@ -350,7 +350,8 @@ SFU 常用内建函数速查
 参考与拓展阅读
 ====================
 
-- NVIDIA CUDA Math API Reference — SFU 内建函数完整列表
+- 深入理解 :doc:`cuda_core` — CUDA Core 流水线和指令吞吐
+- 深入理解 :doc:`tensor_core_architecture` — Tensor Core 矩阵运算单元
 - Parallel Thread Execution ISA — PTX 中 sin/cos/log/exp 指令的规格说明
 - Nsight Compute 性能分析工具 — 查看 SFU 指令的吞吐和延迟指标
 - 超越函数快速算法：Polynomial approximations and implementation — Minimax 多项式的设计原理
