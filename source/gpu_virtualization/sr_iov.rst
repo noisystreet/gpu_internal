@@ -175,24 +175,38 @@ MPS 架构
 
 MPS 通过一个持久化的控制守护进程（``nvidia-cuda-mps-control``）和客户端库实现多进程 CUDA kernel 并发：
 
-.. code-block:: text
+.. mermaid::
 
-   进程 A      进程 B      进程 C      进程 D
-   (CUDA)     (CUDA)     (CUDA)     (CUDA)
-      |          |          |          |
-      +----------+----------+----------+
-                 | MPS Client Library
-                 |
-         +-------+--------+
-         | CUDA MPS Server |
-         | (nvidia-cuda-mps-control)
-         | 单一 CUDA context，合并提交 |
-         +-------++-------+
-                 | GPU 硬件调度器
-                 |
-          +------+------+
-          |    GPU      |
-          +-------------+
+   flowchart TB
+       subgraph Apps["多进程"]
+           PA["进程 A<br/>(CUDA)"]
+           PB["进程 B<br/>(CUDA)"]
+           PC["进程 C<br/>(CUDA)"]
+           PD["进程 D<br/>(CUDA)"]
+       end
+       subgraph MPS_LIB["MPS Client Library"]
+           MCL["合并提交"]
+       end
+       subgraph MPS_SRV["CUDA MPS Server<br/>nvidia-cuda-mps-control"]
+           MS["单一 CUDA context<br/>命令合并"]
+       end
+       subgraph HWS["GPU 硬件调度器"]
+           GW["时间片轮转"]
+       end
+       GPU["GPU"]
+
+       PA --- MCL
+       PB --- MCL
+       PC --- MCL
+       PD --- MCL
+       MCL --- MS
+       MS --- GW
+       GW --- GPU
+
+       style Apps fill:#e8eaf6,color:#283593
+       style MPS_LIB fill:#e3f2fd,color:#1565c0
+       style MPS_SRV fill:#fff3e0,color:#e65100
+       style HWS fill:#f3e5f5,color:#7b1fa2
 
 **MPS 的工作原理**:
 

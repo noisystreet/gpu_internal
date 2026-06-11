@@ -17,18 +17,21 @@ GPU 计算的本质是并行。但真正的挑战不在于同时运行多个 ker
 
 GPU 计算中可重叠的操作类型：
 
-.. code-block:: text
+.. mermaid::
 
-   时间 →
-   ┌──────────┐
-   │ 传输 H2D  │
-   └──────────┘
-              ┌──────────┐  ┌──────────┐  ┌──────────┐
-              │ Kernel 0 │  │ Kernel 1 │  │ Kernel 2 │
-              └──────────┘  └──────────┘  └──────────┘
-              ┌──────────┐
-              │ 传输 D2H  │
-              └──────────┘
+   gantt
+       title 操作重叠示意
+       dateFormat  X
+       axisFormat  %s
+
+       section 传输 H2D
+       传输 H2D        : 0, 3
+       section Kernel
+       Kernel 0        : 3, 3
+       Kernel 1        : 6, 3
+       Kernel 2        : 9, 3
+       section 传输 D2H
+       传输 D2H        : 12, 3
 
    H2D = Host-to-Device, D2H = Device-to-Host
 

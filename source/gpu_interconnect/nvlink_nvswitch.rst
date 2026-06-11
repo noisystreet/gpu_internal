@@ -64,32 +64,33 @@ NVSwitch 拓扑
 
 NVSwitch 实现**全互联（All-to-All）** 拓扑：
 
-.. code-block:: text
+.. mermaid::
 
-   传统 PCIe 拓扑 (PCIe Switch):
-   +--------+     +--------+
-   | GPU 0  |-----| GPU 1  |
-   +--------+     +--------+
-        |              |
-   +---------+  +---------+
-   | PCIe SW |  | PCIe SW |
-   +---------+  +---------+
-        |              |
-   +-------------------------+
-   |      CPU + DRAM         |
-   +-------------------------+
+   flowchart TB
+       subgraph PCIe["传统 PCIe 拓扑"]
+           direction TB
+           GPU0[GPU 0] --- GPU1[GPU 1]
+           GPU0 --- PCIeSW1[PCIe SW]
+           GPU1 --- PCIeSW2[PCIe SW]
+           PCIeSW1 --- CPU[CPU + DRAM]
+           PCIeSW2 --- CPU
+       end
 
-   NVSwitch 拓扑 (DGX/HGX):
-   +-------------------------------------+
-   |            NVSwitch                 |
-   |  +--------+  +--------+  +--------+ |
-   |  | GPU 0  |  | GPU 1  |  | GPU 2  | |
-   |  +--------+  +--------+  +--------+ |
-   |  | GPU 3  |  | GPU 4  |  | GPU 5  | |
-   |  +--------+  +--------+  +--------+ |
-   |  | GPU 6  |  | GPU 7  |            |
-   |  +--------+  +--------+            |
-   +-------------------------------------+
+       subgraph NVSwitch_Top["NVSwitch 拓扑 (DGX/HGX)"]
+           direction LR
+           NVSW["NVSwitch"] --- G0[GPU 0]
+           NVSW --- G1[GPU 1]
+           NVSW --- G2[GPU 2]
+           NVSW --- G3[GPU 3]
+           NVSW --- G4[GPU 4]
+           NVSW --- G5[GPU 5]
+           NVSW --- G6[GPU 6]
+           NVSW --- G7[GPU 7]
+       end
+
+       style CPU fill:#f3e5f5,color:#7b1fa2
+       style NVSW fill:#fff3e0,color:#e65100
+       style PCIe fill:#e8eaf6,color:#283593
 
 **关键特性**:
 

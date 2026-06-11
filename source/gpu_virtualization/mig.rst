@@ -13,31 +13,39 @@ MIG 是 NVIDIA Ampere 及后续架构引入的硬件级 GPU 分区技术，允�
 MIG 架构原理
 =================
 
-.. code-block:: text
+.. mermaid::
 
-   完整 GPU (A100 80GB)
-   +----------------------------------------------------+
-   |  GPC 0 | GPC 1 | GPC 2 | GPC 3 | GPC 4 | GPC 5 | |
-   |  SM 0-7| SM 0-7| SM 0-7| SM 0-7| SM 0-7| SM 0-7| |
-   +----------------------------------------------------+
-   |  HBM2e 显存 (80 GB, 40 个堆栈)                      |
-   +----------------------------------------------------+
-   |  L2 缓存 (40 MB)                                    |
-   +----------------------------------------------------+
+   flowchart TB
+       subgraph FULL["完整 GPU (A100 80GB)"]
+           direction TB
+           GPC["GPC 0-5 | SM 0-7 each"]
+           HBM2["HBM2e 显存 (80 GB, 40 堆栈)"]
+           L2F["L2 缓存 (40 MB)"]
+       end
 
-   分割为 MIG 实例 (示例: 2g.20gb):
-   +---------------------------+---------------------------+
-   |     实例 A (2g.20gb)       |     实例 B (2g.20gb)       |
-   |  GPC 0-1, 2 SM/GPC        |  GPC 2-3, 2 SM/GPC        |
-   |  20 GB HBM2e  分区         |  20 GB HBM2e  分区         |
-   |  L2 20 MB (10 MB x2)      |  L2 20 MB (10 MB x2)      |
-   |  内存带宽 ~800 GB/s        |  内存带宽 ~800 GB/s        |
-   +---------------------------+---------------------------+
-   |     实例 C (1g.20gb)                              |
-   |  GPC 4, 2 SM, 20 GB HBM2e, L2 10 MB              |
-   +----------------------------------------------------+
-   |     未分配 GPC 5                                   |
-   +----------------------------------------------------+
+       FULL -->|"分割"| INST_A
+       FULL --> INST_B
+       FULL --> INST_C
+
+       subgraph INST_A["实例 A (2g.20gb)"]
+           GA["GPC 0-1, 2 SM/GPC<br/>20 GB HBM2e<br/>L2 20 MB<br/>~800 GB/s"]
+       end
+       subgraph INST_B["实例 B (2g.20gb)"]
+           GB["GPC 2-3, 2 SM/GPC<br/>20 GB HBM2e<br/>L2 20 MB<br/>~800 GB/s"]
+       end
+       subgraph INST_C["实例 C (1g.20gb)"]
+           GC["GPC 4, 2 SM<br/>20 GB HBM2e<br/>L2 10 MB"]
+       end
+       UNUSED["未分配 GPC 5"]
+
+       style FULL fill:#f5f5f5,color:#1a1a1a
+       style GPC fill:#e3f2fd,color:#1565c0
+       style HBM2 fill:#fff3e0,color:#e65100
+       style L2F fill:#e8f5e9,color:#1b5e20
+       style INST_A fill:#e8f5e9,color:#1b5e20
+       style INST_B fill:#e8f5e9,color:#1b5e20
+       style INST_C fill:#e8f5e9,color:#1b5e20
+       style UNUSED fill:#fce4ec,color:#b71c1c
 
 MIG 实例配置
 =================

@@ -15,20 +15,31 @@ GPU 虚拟化允许将一块物理 GPU 分割为多个逻辑 GPU 实例，供多
 
 GPU 虚拟化可以在多个层次实现。理解这些层次有助于根据业务需求选择合适的方案：
 
-.. code-block:: text
+.. mermaid::
 
-   层次              方案                    隔离级别
-   ==========       ==================      ==========
-   硬件分区          MIG (NVIDIA)            物理隔离
-                   SR-IOV (AMD/Intel)      物理隔离
-   驱动/运行时       时间切片                  逻辑隔离
-                   vGPU (NVIDIA)           逻辑隔离
-   API 转发          remote-desktop          逻辑隔离
-                   rCUDA / gVirt          弱隔离
+   flowchart TB
+       subgraph HW["硬件分区"]
+           MIG["MIG (NVIDIA)<br/>物理隔离"]
+           SRIOV["SR-IOV (AMD/Intel)<br/>物理隔离"]
+       end
+       subgraph DRV["驱动/运行时"]
+           TS["时间切片<br/>逻辑隔离"]
+           VGPU["vGPU (NVIDIA)<br/>逻辑隔离"]
+       end
+       subgraph API["API 转发"]
+           RD["remote-desktop<br/>逻辑隔离"]
+           RC["rCUDA / gVirt<br/>弱隔离"]
+       end
 
-   MIG/SR-IOV  → 最好的隔离和 QoS 保障
-   时间切片      → 简单灵活，但无资源隔离
-   API 转发      → 支持跨网络，但性能开销大
+       MIG -->|"隔离最强"| SRIOV
+       SRIOV --> TS
+       TS --> VGPU
+       VGPU --> RD
+       RD --> RC
+
+       style HW fill:#e8f5e9,color:#1b5e20
+       style DRV fill:#fff3e0,color:#e65100
+       style API fill:#fce4ec,color:#b71c1c
 
 技术对比
 =============

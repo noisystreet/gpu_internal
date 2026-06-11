@@ -9,15 +9,20 @@ CUDA Core 微架构
 
 CUDA core 本质上是经过优化的流水线化 ALU，围绕 **FMA（Fused Multiply-Add）** 流水线设计，执行 ``D = A * B + C`` 运算。其核心执行路径如下：
 
-.. code-block:: text
+.. mermaid::
 
-   指令 → Warp Scheduler → Dispatch → Operand Collect → FMA Pipeline → Writeback
-                                       │
-                                       ↓
-                              ┌──────────────────┐
-                              │  寄存器文件读取     │
-                              │  (每个线程 2 个 op)  │
-                              └──────────────────┘
+   flowchart LR
+       I["指令"] --> WS["Warp Scheduler"]
+       WS --> D["Dispatch"]
+       D --> OC["Operand Collect"]
+       OC --> RF["寄存器文件读取<br/>(每个线程 2 个 op)"]
+       RF --> FMA["FMA Pipeline"]
+       FMA --> WB["Writeback"]
+
+       style I fill:#e3f2fd,color:#1565c0
+       style WS fill:#e3f2fd,color:#1565c0
+       style FMA fill:#f3e5f5,color:#7b1fa2
+       style WB fill:#e8f5e9,color:#1b5e20
 
 **流水线深度**: FP32 FMA 通常为 4-6 个周期（取决于架构代际），意味着一个 warp 的指令发射后需要 4-6 周期才能得到结果。
 

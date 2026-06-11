@@ -10,22 +10,35 @@
 
 GPU 的内存层次结构是理解和优化 GPU 程序性能的关键。与 CPU 类似，GPU 也采用多级存储层次，但容量和带宽的取舍更加极端。
 
-.. code-block:: text
+.. mermaid::
 
-   寄存器 (Register)
-      |       每个线程私有，~256 个/线程
-      v
-   共享内存 / L1 缓存 (Shared Memory / L1 Cache)
-      |       每个 SM 私有，~48-128 KB 可配置
-      v
-   L2 缓存 (L2 Cache)
-      |       芯片全局共享，~4-40 MB
-      v
-   全局显存 (HBM / GDDR)
-      |       ~16-80 GB，带宽 ~2 TB/s
-      v
-   主机内存 (CPU DRAM)
-             ~64-512 GB，带宽 ~50 GB/s (PCIe 4.0 x16)
+   flowchart LR
+       subgraph REG["寄存器 (Register)"]
+           R["~256 个/线程<br/>每个线程私有"]
+       end
+       subgraph SMEM["共享内存 / L1 缓存"]
+           S["~48-128 KB 可配置<br/>每个 SM 私有"]
+       end
+       subgraph L2["L2 缓存"]
+           L["~4-40 MB<br/>芯片全局共享"]
+       end
+       subgraph HBM["全局显存 (HBM / GDDR)"]
+           G["~16-80 GB<br/>带宽 ~2 TB/s"]
+       end
+       subgraph CPU_DRAM["主机内存 (CPU DRAM)"]
+           C["~64-512 GB<br/>带宽 ~50 GB/s<br/>PCIe 4.0 x16"]
+       end
+
+       REG -->|"容量↑ 速度↓"| SMEM
+       SMEM -->|"容量↑ 速度↓"| L2
+       L2 -->|"容量↑ 速度↓"| HBM
+       HBM -->|"容量↑ 速度↓"| CPU_DRAM
+
+       style REG fill:#f3e5f5,color:#7b1fa2
+       style SMEM fill:#e8eaf6,color:#283593
+       style L2 fill:#e8f5e9,color:#1b5e20
+       style HBM fill:#fff3e0,color:#e65100
+       style CPU_DRAM fill:#fce4ec,color:#b71c1c
 
 .. note::
 

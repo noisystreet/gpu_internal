@@ -69,25 +69,33 @@ GPU vs CPU 架构对比
 GPC 内部结构
 ----------------
 
-.. code-block:: text
+.. mermaid::
 
-   Graphics Processing Cluster (GPC)
-   +--------------------------------------------------+
-   |  TPC 0                    TPC 1                    |
-   |  +-------------------+   +-------------------+    |
-   |  | SM 0     SM 1     |   | SM 2     SM 3     |    |
-   |  | 2 个 SM 共享一个   |   | 2 个 SM 共享一个   |    |
-   |  | 纹理缓存 (L1T)    |   | 纹理缓存 (L1T)    |    |
-   |  +-------------------+   +-------------------+    |
-   |                                                    |
-   |  Raster Engine (光栅化引擎)                         |
-   |  - 三角形设置、光栅化、Z-cull                      |
-   |  - 仅在图形工作负载中活跃                           |
-   |                                                    |
-   |  Ray Intersection Engine (RT Core, Turing+)        |
-   |  - BVH 遍历、ray-triangle 求交                     |
-   |  - 仅在光线追踪工作负载中活跃                      |
-   +--------------------------------------------------+
+   flowchart TB
+       subgraph GPC["Graphics Processing Cluster (GPC)"]
+           subgraph TPC0["TPC 0"]
+               SM0["SM 0"] --- SM1["SM 1"]
+               L1T0["纹理缓存 (L1T)"]
+           end
+           subgraph TPC1["TPC 1"]
+               SM2["SM 2"] --- SM3["SM 3"]
+               L1T1["纹理缓存 (L1T)"]
+           end
+           RE["Raster Engine<br/>光栅化引擎"]
+           RT["Ray Intersection Engine<br/>(RT Core, Turing+)"]
+       end
+
+       style GPC fill:#f5f5f5,color:#1a1a1a
+       style TPC0 fill:#e3f2fd,color:#1565c0
+       style TPC1 fill:#e3f2fd,color:#1565c0
+       style SM0 fill:#bbdefb,color:#0d47a1
+       style SM1 fill:#bbdefb,color:#0d47a1
+       style SM2 fill:#bbdefb,color:#0d47a1
+       style SM3 fill:#bbdefb,color:#0d47a1
+       style L1T0 fill:#fff3e0,color:#e65100
+       style L1T1 fill:#fff3e0,color:#e65100
+       style RE fill:#e8f5e9,color:#1b5e20
+       style RT fill:#f3e5f5,color:#7b1fa2
 
 **SM（Streaming Multiprocessor）**
     NVIDIA GPU 的核心计算单元，包含 CUDA 核心、共享内存、寄存器文件等。

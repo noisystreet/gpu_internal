@@ -106,29 +106,22 @@ SIMT 栈管理
 
 GPU 使用硬件 **SIMT 栈** 管理发散分支。每个 warp 维护一个栈，记录活跃线程掩码（active mask）和收敛点（reconvergence point）：
 
-.. code-block:: text
+.. mermaid::
 
-   执行过程:
+   flowchart TD
+       A["if (condition)"] --> B["then-path<br/>线程 0-7 活跃<br/>线程 8-31 屏蔽"]
+       A --> C["else-path<br/>线程 8-31 活跃<br/>线程 0-7 屏蔽"]
+       B --> D["push mask<br/>栈深度 +1"]
+       C --> D
+       D --> E["then 路径<br/>执行完"]
+       D --> F["else 路径<br/>执行完"]
+       E --> G["pop mask<br/>栈深度 -1<br/>恢复完整 warp"]
+       F --> G
+       G --> H["收敛点<br/>所有线程重新同步"]
 
-   初始状态:
-   Warp 掩码: 0xFFFFFFFF (全部 32 个线程活跃)
-
-   遇到 if-else (条件 C):
-       栈推入: [分支A掩码=C为真, 收敛点L1]
-       执行分支 A: 掩码 = C 为真的线程
-       完成分支 A:
-       栈弹出 → 更新掩码 = C 为假的线程
-       执行分支 B:
-       收敛到 L1
-
-   栈状态变化:
-   +-------------+                +-------------+
-   | 掩码: 全 1  |  遇到 if      | 掩码: C 真  | ← 分支 A
-   |             |  →            | 收敛点: L1  |
-   +-------------+                +-------------+
-                                  | 掩码: C 假  | ← 分支 B
-                                  | 收敛点: L1  |
-                                  +-------------+
+       style A fill:#f3e5f5,color:#7b1fa2
+       style G fill:#e8f5e9,color:#1b5e20
+       style H fill:#fff8e1,color:#e65100
 
 **多级发散** 嵌套分支时，栈深度增加，每个嵌套级别产生额外的 push：
 

@@ -124,41 +124,42 @@ GPU 调度器负责将提交的命令分配到 GPU 执行单元，管理硬件�
 
 NVIDIA 从 Pascal 架构开始引入硬件调度器（HWS），在 GPU 固件中实现调度决策：
 
-.. code-block:: text
+.. mermaid::
 
-   用户态驱动
-   UMD 提交命令缓冲区
-        │
-        ↓
-   内核态驱动
-   KMD 验证并将命令写入 GPU 可访问的环形缓冲区
-        │
-        ↓
-   GPU 固件
-   Channel DMA Engine 解析命令头部
-        │
-        ↓
-   Hardware Scheduler (HWS)
-   ├── Channel 管理: 每个 context 对应一个 channel
-   ├── Time-slicing: 在 active channel 间时间片轮转
-   ├── Priority 仲裁: 高优先级 channel 优先执行
-   └── Preemption: 可抢占正在执行的 kernel
-        │
-        ↓
-   SM / CU 执行
+   flowchart TD
+       UMD["用户态驱动<br/>UMD 提交命令缓冲区"] --> KMD["内核态驱动<br/>KMD 验证并写入环形缓冲区"]
+       KMD --> DMA["GPU 固件<br/>Channel DMA Engine<br/>解析命令头部"]
+       DMA --> HWS["Hardware Scheduler (HWS)"]
+       HWS -->|Channel 管理| CH["每个 context 对应一个 channel"]
+       HWS -->|时间片轮转| TS["在 active channel 间轮转"]
+       HWS -->|优先级仲裁| PR["高优先级 channel 优先"]
+       HWS -->|抢占| PM["可抢占正在执行的 kernel"]
+       HWS --> SM["SM / CU 执行"]
+
+       style UMD fill:#e3f2fd,color:#1a237e
+       style KMD fill:#e3f2fd,color:#1a237e
+       style DMA fill:#e8f5e9,color:#1b5e20
+       style HWS fill:#fff3e0,color:#e65100
+       style SM fill:#f3e5f5,color:#7b1fa2
 
 **Channel 机制**:
 
 每个 CUDA context 对应一个 GPU 侧的 **channel**。HWS 在 channel 间以时间片（~10-100 us）轮转：
 
-.. code-block:: text
+.. mermaid::
 
-   Channel 0 (CUDA App)         : ████████░░░░░░░░░░░░░░░░░░░░░░████████
-   Channel 1 (Graphics)         : ░░░░░░████████░░░░░░░░░░░░░░░░░░░░░░░░
-   Channel 2 (Video Decode)     : ░░░░░░░░░░░░████████████████░░░░░░░░░░
-   Channel 3 (CUDA App 2)       : ░░░░░░░░░░░░░░░░░░░░░░░░░░░████████████
-
-时间 →
+   gantt
+       title Channel 时间片轮转
+       dateFormat X
+       axisFormat %s
+       section Channel 0 (CUDA App)
+       Channel 0    : 0, 4
+       section Channel 1 (Graphics)
+       Channel 1    : 4, 4
+       section Channel 2 (Video Decode)
+       Channel 2    : 8, 6
+       section Channel 3 (CUDA App 2)
+       Channel 3    : 14, 4
 
 **抢占级别**:
 

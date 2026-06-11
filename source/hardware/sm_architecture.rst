@@ -15,26 +15,40 @@ SM 内部结构
 
 以 NVIDIA Ampere 架构的 SM 为例：
 
-.. code-block:: text
+.. mermaid::
 
-   SM (Streaming Multiprocessor)
-   +--------------------------------------------------+
-   |  分区 0              分区 1              分区 2   分区 3  |
-   |  +----------------+  +----------------+ ...       |
-   |  | Warp Scheduler |  | Warp Scheduler |           |
-   |  | Dispatch Unit  |  | Dispatch Unit  |           |
-   |  |                |  |                |           |
-   |  | INT32 核心 x16 |  | INT32 核心 x16 |           |
-   |  | FP32 核心 x16  |  | FP32 核心 x16  |           |
-   |  | Tensor Core x4 |  | Tensor Core x4 |           |
-   |  |                |  |                |           |
-   |  | 寄存器文件     |  | 寄存器文件     |           |
-   |  +----------------+  +----------------+           |
-   |                                                    |
-   |  L1 / 共享内存 (128 KB)                            |
-   |  一级缓存 / 纹理缓存                                |
-   |  加载/存储单元 (LD/ST)                              |
-   +--------------------------------------------------+
+   flowchart TB
+       subgraph SM["SM (Streaming Multiprocessor)"]
+           direction TB
+           subgraph P0["分区 0"]
+               WS0["Warp Scheduler<br/>Dispatch Unit"]
+               CU0["INT32 核心 x16<br/>FP32 核心 x16<br/>Tensor Core x4"]
+               RF0["寄存器文件"]
+           end
+           subgraph P1["分区 1"]
+               WS1["Warp Scheduler<br/>Dispatch Unit"]
+               CU1["INT32 核心 x16<br/>FP32 核心 x16<br/>Tensor Core x4"]
+               RF1["寄存器文件"]
+           end
+           subgraph P2["分区 2"]
+               WS2["Warp Scheduler<br/>Dispatch Unit"]
+               CU2["INT32 核心 x16<br/>FP32 核心 x16<br/>Tensor Core x4"]
+               RF2["寄存器文件"]
+           end
+           subgraph P3["分区 3"]
+               WS3["Warp Scheduler<br/>Dispatch Unit"]
+               CU3["INT32 核心 x16<br/>FP32 核心 x16<br/>Tensor Core x4"]
+               RF3["寄存器文件"]
+           end
+       end
+       SM --- L1["L1 / 共享内存 (128 KB)<br/>一级缓存 / 纹理缓存<br/>加载/存储单元 (LD/ST)"]
+
+       style SM fill:#f5f5f5,color:#1a1a1a
+       style P0 fill:#e3f2fd,color:#1565c0
+       style P1 fill:#e3f2fd,color:#1565c0
+       style P2 fill:#e3f2fd,color:#1565c0
+       style P3 fill:#e3f2fd,color:#1565c0
+       style L1 fill:#f3e5f5,color:#7b1fa2
 
 SM Subcore（子核心）
 =====================

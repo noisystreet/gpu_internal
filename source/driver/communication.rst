@@ -38,28 +38,26 @@ GPU 通常通过 PCI Express 总线连接到主机。
 
 CPU 提交命令到 GPU 的核心机制是通过 **PUSH 缓冲区（Push Buffer）**。当应用程序调用 CUDA API 时，背后的过程远不止一条指令——它是一条从用户空间到硬件寄存器的长链。
 
-.. code-block:: text
+.. mermaid::
 
-   用户空间                   内核空间                      GPU
-   ==========                ==========                    ===
-   应用程序
-      | (1) 构造命令
-      v
-   UMD 构建命令缓冲区
-      | (2) 调用 ioctl
-      v
-   KMD:
-      | (3) 验证并映射
-      | (4) 写 PUSH 缓冲区
-      v
-   硬件 MMIO / Doorbell:
-      | (5) 写入 GPU 寄存器
-      v
-   GPU 固件 / 微控制器:
-      | (6) 解析命令
-      | (7) 调度到执行单元
-      v
-   SM / CU 执行
+   sequenceDiagram
+       participant App as 应用程序
+       participant UMD as 用户态驱动 (UMD)
+       participant KMD as 内核态驱动 (KMD)
+       participant MMIO as 硬件 MMIO/Doorbell
+       participant GPU as GPU 固件
+       participant SM as SM/CU
+
+       App->>UMD: (1) 构造命令
+       UMD->>UMD: 构建命令缓冲区
+       UMD->>KMD: (2) 调用 ioctl
+       KMD->>KMD: (3) 验证并映射
+       KMD->>KMD: (4) 写 PUSH 缓冲区
+       KMD->>MMIO: (5) 写入 GPU 寄存器
+       MMIO->>GPU: Doorbell 通知
+       GPU->>GPU: (6) 解析命令
+       GPU->>GPU: (7) 调度到执行单元
+       GPU->>SM: 执行
 
 **Doorbell 机制**:
 
@@ -69,14 +67,19 @@ CPU 提交命令到 GPU 的核心机制是通过 **PUSH 缓冲区（Push Buffer�
 
 命令缓冲区通常组织为环状结构，GPU 通过读取生产/消费指针获取新的命令：
 
-.. code-block:: text
+.. mermaid::
 
-   +---------------------------------------------------+
-   |  cmd0 | cmd1 | cmd2 | cmd3 |  ...  | cmdN | ...   |
-   +---------------------------------------------------+
-       ^                          ^
-       |                          |
-   消费指针 (GPU 更新)       生产指针 (CPU 更新)
+   flowchart LR
+       subgraph Ring["环形缓冲区"]
+           CMD0["cmd 0"] --- CMD1["cmd 1"] --- CMD2["cmd 2"]
+           CMD2 --- CMD3["cmd 3"] --- DOTS["..."] --- CMDN["cmd N"]
+       end
+       CP["消费指针 &#40GPU 更新&#41"] -.-> CMD2
+       PP["生产指针 &#40CPU 更新&#41"] -.-> CMDN
+
+       style Ring fill:#e8eaf6,color:#283593
+       style CP fill:#f3e5f5,color:#7b1fa2
+       style PP fill:#e3f2fd,color:#1565c0
 
 同步机制
 ============

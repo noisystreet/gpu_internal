@@ -15,21 +15,17 @@ Infinity Fabric 架构概览
 
 Infinity Fabric 由两个逻辑层组成：
 
-.. code-block:: text
+.. mermaid::
 
-   +------------------------------------------+
-   |           Infinity Fabric                 |
-   |  +------------------+  +--------------+   |
-   |  | 数据传输层 (SDF)  |  | 控制管理层   |   |
-   |  | Scalable Data     |  | (SCF)        |   |
-   |  | Fabric            |  | Scalable     |   |
-   |  |                   |  | Control      |   |
-   |  | 负责数据包路由     |  | Fabric       |   |
-   |  | 重排序、协议转换   |  | 负责电源管理  |  |
-   |  +------------------+  | 时钟同步      |   |
-   |                         | 初始化/配置   |   |
-   |                         +--------------+   |
-   +------------------------------------------+
+   flowchart TB
+       subgraph IF["Infinity Fabric"]
+           SDF["数据传输层 (SDF)<br/>Scalable Data Fabric<br/>数据包路由、重排序、协议转换"]
+           SCF["控制管理层 (SCF)<br/>Scalable Control Fabric<br/>电源管理、时钟同步、初始化/配置"]
+       end
+
+       style IF fill:#f5f5f5,color:#1a1a1a
+       style SDF fill:#e3f2fd,color:#1565c0
+       style SCF fill:#fff3e0,color:#e65100
 
 Infinity Fabric 的**关键特性**:
 
@@ -43,24 +39,36 @@ AMD GPU 互联拓扑
 
 **MI300X 八路 GPU 互联**:
 
-.. code-block:: text
+.. mermaid::
 
-   +-------------------+    +-------------------+
-   |   GCD 0 (GPU)     |    |   GCD 1 (GPU)     |
-   |   +-----------+   |    |   +-----------+   |
-   |   | XCD + HBM |   |    |   | XCD + HBM |   |
-   |   +-----------+   |    |   +-----------+   |
-   +--------+----------+    +----------+--------+
-            |                          |
-   +--------+----------+    +----------+--------+
-   |   GCD 2 (GPU)     |    |   GCD 3 (GPU)     |
-   |   +-----------+   |    |   +-----------+   |
-   |   | XCD + HBM |   |    |   | XCD + HBM |   |
-   |   +-----------+   |    |   +-----------+   |
-   +-------------------+    +-------------------+
+   flowchart TB
+       subgraph GCD0["GCD 0 (GPU)"]
+           XCD0["XCD + HBM"]
+       end
+       subgraph GCD1["GCD 1 (GPU)"]
+           XCD1["XCD + HBM"]
+       end
+       subgraph GCD2["GCD 2 (GPU)"]
+           XCD2["XCD + HBM"]
+       end
+       subgraph GCD3["GCD 3 (GPU)"]
+           XCD3["XCD + HBM"]
+       end
 
-   每个 GCD 通过 6 条 Infinity Fabric 链路互联
-   总聚合带宽 ~896 GB/s
+       GCD0 ---|6 Infinity Fabric 链路| GCD1
+       GCD0 --- GCD2
+       GCD0 --- GCD3
+       GCD1 --- GCD2
+       GCD1 --- GCD3
+       GCD2 --- GCD3
+
+       NOTE["每个 GCD 通过 6 条 Infinity Fabric 链路互联<br/>总聚合带宽 ~896 GB/s"]
+
+       style GCD0 fill:#e3f2fd,color:#1565c0
+       style GCD1 fill:#e3f2fd,color:#1565c0
+       style GCD2 fill:#e3f2fd,color:#1565c0
+       style GCD3 fill:#e3f2fd,color:#1565c0
+       style NOTE fill:#fff8e1,color:#e65100
 
 Infinity Fabric vs NVLink
 ==============================
