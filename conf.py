@@ -24,7 +24,7 @@ language = "zh_CN"
 # -- Options for HTML output -------------------------------------------------
 html_theme = "sphinx_rtd_theme"
 html_theme_options = {
-    "navigation_depth": 2,
+    "navigation_depth": 3,
 }
 html_static_path = ["_static"]
 
