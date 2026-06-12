@@ -257,26 +257,12 @@ Roofline 模型是将计算吞吐和内存带宽统一在一个坐标系中的�
 
 **Roofline 模型的基本形式**：
 
-.. code-block:: text
+.. figure:: /source/figures/roofline.svg
+   :width: 100%
+   :align: center
+   :alt: Roofline 模型 — H100 SXM
 
-   性能 (FLOPS)
-       ↑
-   FP32 峰值  ────────────────────────┐
-   (H100: 67 TFLOPS)                   │ 计算受限区
-                                       │ (compute-bound)
-       │                               │
-       │                      ┌────────┘
-       │               ○ ← 你的 kernel
-       │              /
-       │             /
-       │            /
-       │           /
-   内存带宽  ─────┼────────────── 访存受限区
-   (2 TB/s)       │               (memory-bound)
-       │          │
-       └──────────┴────────────────────────→
-                 算术强度 (FLOPS/Byte)
-                 ridge point
+   Roofline 模型将计算吞吐（TFLOPS）和内存带宽（TB/s）统一在同一坐标系中。散点标注了典型 Kernel 的位置。
 
 **核心指标：算术强度（Arithmetic Intensity）**
 

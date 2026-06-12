@@ -10,38 +10,15 @@ NVLink 与 NVSwitch
 
 NVLink 是 NVIDIA 开发的高带宽 GPU 间直接互联协议，旨在突破 PCIe 的带宽瓶颈。NVSwitch 是 NVLink 的全连接交换机，实现 GPU 之间的任意拓扑互联。在深入 NVLink 的具体规格之前，先从一个关键问题出发：为什么 PCIe 不够用？
 
-NVLink 演进
-=================
+NVLink 代际演进
+====================
 
-NVLink 自首次推出以来经历了多代演进，每一代的带宽和链路数都在增长：
+.. figure:: /source/figures/nvlink_evolution.svg
+   :width: 85%
+   :align: center
+   :alt: NVLink 代际演进
 
-.. list-table::
-   :header-rows: 1
-
-   * - 版本
-     - 单链路带宽
-     - 每 GPU 链路数
-     - 总带宽 (双向)
-   * - NVLink 1.0 (P100)
-     - 20 GB/s
-     - 4
-     - 160 GB/s
-   * - NVLink 2.0 (V100)
-     - 25 GB/s
-     - 6
-     - 300 GB/s
-   * - NVLink 3.0 (A100)
-     - 50 GB/s
-     - 12
-     - 600 GB/s
-   * - NVLink 4.0 (H100)
-     - 50 GB/s
-     - 18
-     - 900 GB/s
-   * - NVLink 5.0 (B100)
-     - 100 GB/s
-     - 18
-     - 1800 GB/s
+   NVLink 从 1.0 到 5.0 的带宽演进。左轴为单链路带宽，右轴为 8 GPU 聚合双向带宽。
 
 与 PCIe 对比
 =================

@@ -91,21 +91,13 @@ Tensor Core vs CUDA Core 吞吐对比
 
 以 H100 SXM 为例，不同精度下的峰值吞吐：
 
-.. code-block:: text
+.. figure:: /source/figures/tensor_vs_cuda_throughput.svg
+   :width: 85%
+   :align: center
+   :alt: Tensor Core vs CUDA Core 吞吐对比
 
-   精度        Tensor Core TFLOPS   CUDA Core TFLOPS   加速比
-   ──────     ──────────────────   ────────────────   ──────
-   FP64               67                 67             1x
-   FP32               67                 67             1x
-   TF32              989                 —              —
-   FP16              989                —               —
-   BF16              989                —               —
-   FP8 (E4M3)       1979                —               —
-   INT8             1979                —               —
-   FP4                —                 —               —
-
-   "—" 表示该格式在该单元上不支持。GPU 计算主要通过 Tensor Core 完成，
-   CUDA Core 现在更多执行地址计算、控制流和少量标量运算。
+   H100 SXM 上 Tensor Core 与 CUDA Core 在各种精度下的峰值吞吐对比。
+   Tensor Core 在 FP16/BF16/TF32 精度下提供 ~15x 的吞吐提升。注意 TF32 无需修改代码即可获得大幅加速。
 
 使用场景
 ============
