@@ -54,21 +54,30 @@ def annotate_bars(ax, bars, offset=0, fmt="int", color=None):
                 label, ha="center", fontsize=9, fontweight="bold", color=c)
 
 
-def draw_pyramid_layers(ax, layers, height=0.9):
+def draw_pyramid_layers(ax, layers, height=0.9, put_detail_outside=None):
     """Draw stacked colored rectangles with title and detail text.
     
     layers: list of (width, title, detail, color)
+    put_detail_outside: set of layer indices whose detail text goes to the right
     """
+    if put_detail_outside is None:
+        put_detail_outside = set()
     for i, (width, title, detail, color) in enumerate(layers):
         y = i
         rect = plt.Rectangle((-width / 2, y), width, height,
                              facecolor=color, alpha=0.85,
                              edgecolor="white", linewidth=2)
         ax.add_patch(rect)
-        ax.text(0, y + height * 0.55, title, ha="center", va="center",
-                fontsize=10, color="white", fontweight="bold")
-        ax.text(0, y + height * 0.15, detail, ha="center", va="center",
-                fontsize=8, color="white", alpha=0.9)
+        ax.text(0, y + height * 0.5, title, ha="center", va="center",
+                fontsize=9, color="white", fontweight="bold")
+        if i in put_detail_outside:
+            # Place detail outside (to the right) for narrow layers
+            ax.text(width / 2 + 0.03, y + height / 2, detail,
+                    ha="left", va="center", fontsize=7, color=color,
+                    fontweight="bold")
+        else:
+            ax.text(0, y + height * 0.12, detail, ha="center", va="center",
+                    fontsize=7, color="white", alpha=0.9)
 
 
 def setup_axis_off(ax, title, xlim=(-0.8, 0.8), ylim=(-0.5, 5.5)):
@@ -129,7 +138,7 @@ def memory_pyramid():
         (0.4,  "Global Memory (HBM)",  "~80 GB\n~2 TB/s\n~400 cycles", ORANGE),
         (0.2,  "Host CPU DRAM",       "~512 GB\n~50 GB/s\nPCIe 4.0",  RED),
     ]
-    draw_pyramid_layers(ax, levels)
+    draw_pyramid_layers(ax, levels, put_detail_outside={3, 4})
 
     ax.annotate("", xy=(0, -0.1), xytext=(0, 5.2),
                 arrowprops=dict(arrowstyle="<->", lw=1.5, color="gray"))
@@ -259,7 +268,7 @@ def comm_hierarchy():
         (0.6, "Inter-Node\nNVSwitch / IF", "100-400 GB/s", ORANGE),
         (0.3, "Inter-Rack\nIB / RoCE",     "25-200 GB/s",  BROWN),
     ]
-    draw_pyramid_layers(ax, levels, height=1.0)
+    draw_pyramid_layers(ax, levels, height=1.0, put_detail_outside={2})
 
     ax.text(-0.55, 1.0, "Bandwidth\n\u2193", fontsize=10, color="gray",
             ha="center", va="center")
