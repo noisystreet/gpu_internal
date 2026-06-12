@@ -106,34 +106,29 @@ NVIDIA vGPU（时间切片）
 
 NVIDIA vGPU（原 GRID vGPU）是另一种虚拟化方案，使用软件方式在时间维度上复用 GPU：
 
-.. code-block:: text
+.. figure:: /source/figures/vgpu_architecture.svg
+   :width: 75%
+   :align: center
+   :alt: vGPU 架构
 
-   虚拟机 0          虚拟机 1          虚拟机 2
-   +--------+       +--------+       +--------+
-   | vGPU   |       | vGPU   |       | vGPU   |
-   | 驱动    |       | 驱动    |       | 驱动    |
-   +----+---+       +----+---+       +----+---+
-        |                |                |
-   +----+----+-----+----+----+-----+----+----+
-   |   NVIDIA vGPU Manager (宿主机)          |
-   |   - 时间切片调度                        |
-   |   - 显存超分管理                        |
-   |   - 帧缓存管理                          |
-   +----+----------------------------------+
-        |
-   +----+----------------------------------+
-   |   NVIDIA GPU 硬件                      |
-   +---------------------------------------+
+   vGPU 架构：多个虚拟机的 vGPU 驱动通过宿主机上的 vGPU Manager 访问底层 GPU 硬件。
 
 **vGPU 时间切片工作模式**:
 
-.. code-block:: text
+.. mermaid::
 
-   时间 →
-   +----------+----------+----------+----------+
-   | VM0      | VM1      | VM2      | VM0      |
-   | (5 ms)   | (5 ms)   | (5 ms)   | (5 ms)   |
-   +----------+----------+----------+----------+
+   gantt
+       title vGPU 时间切片 (5ms each)
+       dateFormat X
+       axisFormat %s
+       section VM 0
+       VM 0     : 0, 5
+       section VM 1
+       VM 1     : 5, 5
+       section VM 2
+       VM 2     : 10, 5
+       section VM 0
+       VM 0     : 15, 5
 
 每个时间片内，vGPU Manager 将全部 GPU 资源分配给对应的虚拟机，通过快速上下文切换实现多 VM 共享。
 

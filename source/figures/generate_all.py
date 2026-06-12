@@ -318,6 +318,186 @@ def ring_allreduce():
 
 
 # ============================================================
+# 9. Warp Scheduling Timing (Greedy Oldest Ready)
+# ============================================================
+def warp_scheduling():
+    fig, ax = plt.subplots(figsize=(8, 3.5))
+
+    cycles = 8
+    warps = [0, 1, 2, 3]
+    # Greedy Oldest Ready schedule: W0→W1→W3→W3→W0→W1→W3→W3
+    schedule = [(0, 0), (1, 1), (3, 2), (3, 3), (0, 4), (1, 5), (3, 6), (3, 7)]
+
+    for w in warps:
+        ax.barh(w, cycles, left=0, height=0.6, color="#f5f5f5", edgecolor="none", zorder=1)
+
+    for warp_id, cycle in schedule:
+        ax.barh(warp_id, 1, left=cycle, height=0.6, color=ORANGE, alpha=0.85,
+                edgecolor="white", linewidth=1, zorder=2)
+        ax.text(cycle + 0.5, warp_id, "I", ha="center", va="center",
+                fontsize=9, fontweight="bold", color="white")
+
+    # Warp 2 is stalled — add note
+    ax.annotate("Stalled\n(mem wait)", xy=(3.5, 2), xytext=(5.5, 2.8),
+                fontsize=8, color=BROWN, ha="center",
+                arrowprops=dict(arrowstyle="->", color=BROWN, lw=1))
+
+    ax.set_yticks(warps)
+    ax.set_yticklabels([f"Warp {w}" for w in warps], fontsize=10)
+    ax.set_xticks(range(cycles))
+    ax.set_xlabel("Clock Cycle", fontsize=11)
+    ax.set_title("Greedy Oldest Ready Scheduling (4 warps, 1 issue/cycle)", fontsize=12, fontweight="bold")
+    ax.set_xlim(-0.5, cycles - 0.5)
+    ax.set_ylim(-0.8, 3.8)
+    ax.grid(axis="x", alpha=0.3)
+    fig.tight_layout()
+    save_figure(fig, "warp_scheduling.svg")
+
+
+# ============================================================
+# 10. Warp Latency Hiding
+# ============================================================
+def warp_latency_hiding():
+    fig, ax = plt.subplots(figsize=(8, 3.5))
+
+    cycles = 8
+    warps = [0, 1, 2, 3]
+    # Each warp issues every 4 cycles (hides ~400 cycle memory latency with 100 warps)
+    schedule = {0: [0, 4], 1: [1, 5], 2: [2, 6], 3: [3, 7]}
+
+    for w in warps:
+        ax.barh(w, cycles, left=0, height=0.6, color="#f5f5f5", edgecolor="none", zorder=1)
+
+    for w, cycles_list in schedule.items():
+        for c in cycles_list:
+            ax.barh(w, 1, left=c, height=0.6, color=BLUE, alpha=0.85,
+                    edgecolor="white", linewidth=1, zorder=2)
+            ax.text(c + 0.5, w, "I", ha="center", va="center",
+                    fontsize=9, fontweight="bold", color="white")
+
+        # Connect instructions with arrow to show spacing
+        if len(cycles_list) > 1:
+            ax.annotate("", xy=(cycles_list[1], w), xytext=(cycles_list[0] + 1, w),
+                        arrowprops=dict(arrowstyle="<->", color=GREEN, lw=1.5, linestyle="--"))
+
+    ax.set_yticks(warps)
+    ax.set_yticklabels([f"Warp {w}" for w in warps], fontsize=10)
+    ax.set_xticks(range(cycles))
+    ax.set_xlabel("Clock Cycle", fontsize=11)
+    ax.set_title("Zero-overhead Latency Hiding (4 cycles between same-warp issues)", fontsize=12, fontweight="bold")
+    ax.set_xlim(-0.5, cycles - 0.5)
+    ax.set_ylim(-0.8, 3.8)
+    ax.grid(axis="x", alpha=0.3)
+    fig.tight_layout()
+    save_figure(fig, "warp_latency_hiding.svg")
+
+
+# ============================================================
+# 11. vGPU Architecture
+# ============================================================
+def vgpu_architecture():
+    fig, ax = plt.subplots(figsize=(7, 5.5))
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+    # VM layer
+    vm_y = 4.2
+    for i, (name, x) in enumerate([("VM 0\nvGPU Driver", -1.2), ("VM 1\nvGPU Driver", 0), ("VM 2\nvGPU Driver", 1.2)]):
+        rect = plt.Rectangle((x - 0.45, vm_y), 0.9, 0.6, facecolor="#e3f2fd",
+                             edgecolor=BLUE, linewidth=1.5)
+        ax.add_patch(rect)
+        ax.text(x, vm_y + 0.3, name, ha="center", va="center", fontsize=8, fontweight="bold", color=BLUE)
+
+    # vGPU Manager layer
+    mgr_y = 2.8
+    mgr = plt.Rectangle((-1.7, mgr_y), 3.4, 0.9, facecolor=ORANGE, alpha=0.85,
+                        edgecolor="white", linewidth=2)
+    ax.add_patch(mgr)
+    ax.text(0, mgr_y + 0.45, "NVIDIA vGPU Manager (Hypervisor)", ha="center", va="center",
+            fontsize=10, fontweight="bold", color="white")
+    ax.text(0, mgr_y + 0.12, "Time-slicing Scheduler  |  Memory Overcommit  |  Frame Buffer Mgmt",
+            ha="center", va="center", fontsize=7, color="white", alpha=0.9)
+
+    # GPU Hardware layer
+    hw_y = 1.2
+    hw = plt.Rectangle((-1.7, hw_y), 3.4, 1.0, facecolor=BROWN, alpha=0.85,
+                       edgecolor="white", linewidth=2)
+    ax.add_patch(hw)
+    ax.text(0, hw_y + 0.5, "NVIDIA GPU Hardware", ha="center", va="center",
+            fontsize=10, fontweight="bold", color="white")
+    ax.text(0, hw_y + 0.15, "SM  |  HBM  |  NVLink", ha="center", va="center",
+            fontsize=8, color="white", alpha=0.9)
+
+    # Arrows: VM → Manager
+    for x in [-1.2, 0, 1.2]:
+        ax.annotate("", xy=(x, mgr_y + 0.9), xytext=(x, vm_y),
+                    arrowprops=dict(arrowstyle="->", color="gray", lw=1.5))
+
+    # Arrow: Manager → GPU
+    ax.annotate("", xy=(0, hw_y + 1.0), xytext=(0, mgr_y),
+                arrowprops=dict(arrowstyle="->", color="gray", lw=2))
+
+    # Title
+    ax.set_title("vGPU Architecture", fontsize=13, fontweight="bold", pad=15, y=0.95)
+    ax.set_xlim(-2.2, 2.2)
+    ax.set_ylim(0.5, 5.5)
+    fig.tight_layout()
+    save_figure(fig, "vgpu_architecture.svg")
+
+
+# ============================================================
+# 12. MIG Multi-tenant Configuration (Table / Heatmap)
+# ============================================================
+def mig_tenants():
+    fig, ax = plt.subplots(figsize=(8, 2.5))
+    ax.axis("off")
+
+    tenants = [
+        ("Tenant A", "3g.40gb", "LLM Training", "42 SM", "80 GB/s", ORANGE),
+        ("Tenant B", "2g.20gb", "CPU Inference", "28 SM", "40 GB/s", BLUE),
+        ("Tenant C", "1g.20gb", "GPU Inference", "14 SM", "20 GB/s", GREEN),
+        ("Tenant D", "Unallocated", "—", "—", "—", GRAY),
+    ]
+
+    cols = ["Tenant", "MIG Profile", "Workload", "Compute", "Mem BW"]
+    ncols = len(cols)
+    nrows = len(tenants) + 1
+    cell_w = 1.4
+    cell_h = 0.55
+
+    # Header
+    for j, col in enumerate(cols):
+        x = j * cell_w
+        rect = plt.Rectangle((x, nrows * cell_h), cell_w, cell_h,
+                             facecolor="#333", edgecolor="white", linewidth=1)
+        ax.add_patch(rect)
+        ax.text(x + cell_w / 2, nrows * cell_h + cell_h / 2, col,
+                ha="center", va="center", fontsize=10, fontweight="bold", color="white")
+
+    # Data rows
+    for i, (name, profile, workload, compute, bw, color) in enumerate(tenants):
+        row = nrows - 1 - i
+        bg = color if i < 3 else "#f5f5f5"
+        fc = "white" if i < 3 else "#333"
+        for j, val in enumerate([name, profile, workload, compute, bw]):
+            x = j * cell_w
+            rect = plt.Rectangle((x, row * cell_h), cell_w, cell_h,
+                                 facecolor=bg, alpha=0.85 if i < 3 else 0.5,
+                                 edgecolor="white", linewidth=0.5)
+            ax.add_patch(rect)
+            ax.text(x + cell_w / 2, row * cell_h + cell_h / 2, val,
+                    ha="center", va="center", fontsize=9, fontweight="bold" if j == 0 else "normal",
+                    color=fc)
+
+    ax.set_xlim(0, ncols * cell_w)
+    ax.set_ylim(0, nrows * cell_h)
+    ax.set_title("MIG Multi-Tenant Configuration (A100 80GB)", fontsize=12,
+                 fontweight="bold", pad=10)
+    fig.tight_layout()
+    save_figure(fig, "mig_tenants.svg")
+
+
+# ============================================================
 # Main
 # ============================================================
 if __name__ == "__main__":
@@ -332,6 +512,10 @@ if __name__ == "__main__":
     chip_area_allocation()
     comm_hierarchy()
     ring_allreduce()
+    warp_scheduling()
+    warp_latency_hiding()
+    vgpu_architecture()
+    mig_tenants()
     print("=" * 50)
     print("All done")
     print("=" * 50)

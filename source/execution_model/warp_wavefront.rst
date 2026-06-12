@@ -15,16 +15,23 @@ Warp 的概念
 
 Warp 是一组 **32 个连续的线程**，在 SM 上以 SIMD（Single Instruction, Multiple Data）方式执行。一个线程块中的线程按连续的 threadIdx 分组为 warp。
 
-.. code-block:: text
+.. mermaid::
 
-   线程块 (Block Size = 256)
-   +--------------------------------------------------+
-   | Warp 0:  线程  0 -  31                           |
-   | Warp 1:  线程 32 -  63                           |
-   | Warp 2:  线程 64 -  95                           |
-   | ...                                               |
-   | Warp 7:  线程 224 - 255                          |
-   +--------------------------------------------------+
+   flowchart LR
+       subgraph Block["线程块 (Block Size = 256)"]
+           direction TB
+           W0["Warp 0: 线程 0 - 31"]
+           W1["Warp 1: 线程 32 - 63"]
+           W2["Warp 2: 线程 64 - 95"]
+           WD["..."]
+           W7["Warp 7: 线程 224 - 255"]
+       end
+
+       style Block fill:#e8eaf6,color:#283593
+       style W0 fill:#e3f2fd,color:#1565c0
+       style W1 fill:#e3f2fd,color:#1565c0
+       style W2 fill:#e3f2fd,color:#1565c0
+       style W7 fill:#e3f2fd,color:#1565c0
 
 Warp 调度策略
 =================
@@ -53,18 +60,12 @@ Warp 调度策略
      - 兼顾延迟和吞吐
      - 混合负载
 
-.. code-block:: text
+.. figure:: /source/figures/warp_scheduling.svg
+   :width: 90%
+   :align: center
+   :alt: Greedy Oldest Ready 调度示例
 
-   Greedy Oldest Ready 调度示例（4 warp, 每周期 1 发射）:
-
-   周期:   | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
-   ------------------------------------------------
-   Warp 0: | I |   |   |   | I |   |   |   |
-   Warp 1: |   | I |   |   |   | I |   |   |
-   Warp 2: |   |   |   |   |   |   |   |   |  ← 停顿（等待内存）
-   Warp 3: |   |   | I | I |   |   | I | I |
-
-   就绪状态: warp 0 和 warp 1 连续发射，warp 3 在其间穿插
+   Greedy Oldest Ready 调度示例（4 warp, 每周期 1 发射）。Warp 0 和 Warp 1 连续发射，Warp 2 因等待内存而停顿，Warp 3 在空闲周期穿插发射。
 
 **指令发射宽度**:
 
@@ -74,25 +75,30 @@ Warp 调度策略
 - **Volta**: 每调度器每周期 2 条指令（2-issue），可同时发射一条计算指令和一条内存指令
 - **Ampere/Hopper**: 每调度器仍为 1-issue，但通过更多 subcore 并行提升总吞吐
 
-.. code-block:: text
+.. mermaid::
 
-   Volta 2-issue 示例:
-   周期 0: warp 3 发射 [计算指令] + [内存加载]  ← 并行
-   周期 1: warp 1 发射 [计算指令] + [符号指令]
+   gantt
+       title Volta 2-issue: Compute + Memory in parallel
+       dateFormat X
+       axisFormat %s
+       section Warp 3
+       计算指令     : 0, 1
+       内存加载     : 0, 1
+       section Warp 1
+       计算指令     : 1, 1
+       符号指令     : 1, 1
 
 **零成本线程切换（Zero-overhead Thread Switching）**
     GPU 的上下文切换成本接近于零。当当前 warp 因等待内存访问结果而停顿时，调度器立即切换到另一个就绪的 warp。多个就绪 warp 帮助隐藏长延迟操作（如全局内存访问，200-800 周期）。
 
 **指令发射延迟隐藏**:
 
-.. code-block:: text
+.. figure:: /source/figures/warp_latency_hiding.svg
+   :width: 90%
+   :align: center
+   :alt: 延迟隐藏调度
 
-   时钟周期: | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | ...
-   --------------------------------------------------
-   Warp 0:    | I0 |    |    |    | I1 |    |    | ...
-   Warp 1:    |    | I0 |    |    |    | I1 |    | ...
-   Warp 2:    |    |    | I0 |    |    |    | I1 | ...
-   Warp 3:    |    |    |    | I0 |    |    |    | I1
+   通过 warp 间轮转隐藏指令延迟。同一个 warp 的两条指令相隔 4 个周期，在足够多的 warp（100+）参与下可完全隐藏内存延迟。
 
    需要足够的 active warp 来隐藏延迟。例如，对于 4 周期延迟，至少需要 4 个 warp 达到满吞吐。
 
