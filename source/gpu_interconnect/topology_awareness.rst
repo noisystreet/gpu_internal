@@ -144,15 +144,12 @@ NCCL (NVIDIA Collective Communications Library) 内置拓扑感知能力：
 
 常见的 GPU 互联拓扑形成清晰的层次结构：
 
-.. code-block:: text
+.. figure:: /source/figures/comm_hierarchy.svg
+   :width: 70%
+   :align: center
+   :alt: GPU 通信层级
 
-   节点内 (NVLink / Infinity Fabric) — 高带宽 (600-900 GB/s)
-       ↓
-   节点间 (NVLink Switch / Infinity Fabric) — 中带宽 (100-400 GB/s)
-       ↓
-   机架间 (IB / RoCE) — 低带宽 (25-200 GB/s)
-
-编程时应在最高带宽的层级尽量聚合数据，减少低带宽层级的通信量。
+   GPU 通信层次化结构：节点内 NVLink/IF（600-900 GB/s）→ 节点间 NVSwitch/IF（100-400 GB/s）→ 机架间 IB/RoCE（25-200 GB/s）。编程时应在最高带宽的层级尽量聚合数据。
 
 常见拓扑模式与适用场景
 ==============================
@@ -196,17 +193,12 @@ Ring AllReduce 是最广泛使用的通信算法之一。它将 N 个 GPU 连接
 
 其中 :math:`\alpha` 是每次通信的固定延迟，:math:`S` 是数据量，:math:`B` 是带宽。
 
-.. code-block:: text
+.. figure:: /source/figures/ring_allreduce.svg
+   :width: 100%
+   :align: center
+   :alt: Ring AllReduce 步骤
 
-   Ring AllReduce 示例（4 GPU, ReduceScatter 阶段）:
-
-   第 1 步:   第 2 步:   第 3 步:
-   G0→G1: C0  G0→G1: C1  G0→G1: C2
-   G1→G2: C1  G1→G2: C2  G1→G2: C0
-   G2→G3: C2  G2→G3: C0  G2→G3: C1
-   G3→G0: C0  G3→G0: C1  G3→G0: C2
-
-   C0/C1/C2 = 数据块。每步每个 GPU 同时发送和接收一个块。
+   Ring AllReduce 的 ReduceScatter 阶段（3 步骤，4 GPU）。每步每个 GPU 同时向邻居发送和接收一个数据块。C0/C1/C2 分别标记不同数据块在每个 GPU 间的流动路径。
 
 **Tree AllReduce**
 

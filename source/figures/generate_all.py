@@ -223,6 +223,135 @@ def kernel_arithmetic_intensity():
 
 
 # ============================================================
+# 6. GPU Chip Area Allocation (Pie Chart)
+# ============================================================
+def chip_area_allocation():
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5))
+
+    # GPU chip area
+    gpu_labels = ["SM / CUDA Core\n(Computation)", "SRAM\n(L2 + Register)",
+                   "HBM PHY + I/O\n(Memory IF)", "NVLink / PCIe PHY\n(Interconnect)",
+                   "Fixed Function\n(Raster/Video)", "Other\n(Clock/Scan)"]
+    gpu_sizes = [45, 20, 15, 8, 7, 5]
+    gpu_colors = ["#e65100", "#1565c0", "#2e7d32", "#7b1fa2", "#6d4c41", "#9e9e9e"]
+
+    wedges1, texts1, autotexts1 = ax1.pie(gpu_sizes, labels=None, autopct="%d%%",
+        colors=gpu_colors, startangle=90, explode=(0.05, 0, 0, 0, 0, 0),
+        textprops={"fontsize": 10, "fontweight": "bold"})
+    for at in autotexts1:
+        at.set_color("white")
+        at.set_fontweight("bold")
+    ax1.set_title("Ampere GA100 Chip Area", fontsize=12, fontweight="bold", pad=15)
+
+    # CPU chip area for comparison
+    cpu_labels = ["Cache\n(L1+L2+L3)", "Control Logic\n(Branch Predict/OOO)",
+                   "Computation\n(ALU/FPU)", "Other\n(I/F/Clock)"]
+    cpu_sizes = [50, 25, 20, 5]
+    cpu_colors = ["#1565c0", "#6d4c41", "#e65100", "#9e9e9e"]
+
+    wedges2, texts2, autotexts2 = ax2.pie(cpu_sizes, labels=None, autopct="%d%%",
+        colors=cpu_colors, startangle=90, explode=(0.05, 0, 0, 0),
+        textprops={"fontsize": 10, "fontweight": "bold"})
+    for at in autotexts2:
+        at.set_color("white")
+        at.set_fontweight("bold")
+    ax2.set_title("CPU Die Area (Typical)", fontsize=12, fontweight="bold", pad=15)
+
+    # Shared legend
+    fig.legend(wedges1, gpu_labels, loc="lower center", ncol=3, fontsize=9,
+               bbox_to_anchor=(0.5, -0.05))
+    fig.tight_layout(rect=[0, 0.08, 1, 1])
+    fig.savefig(os.path.join(OUTPUT_DIR, "chip_area_allocation.svg"), dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    print("  [OK] chip_area_allocation.svg")
+
+
+# ============================================================
+# 7. Communication Hierarchy (Pyramid)
+# ============================================================
+def comm_hierarchy():
+    fig, ax = plt.subplots(figsize=(7, 4.5))
+
+    levels = [
+        (0.9, "Intra-Node\nNVLink / IF",  "600-900 GB/s",  "#1565c0"),
+        (0.6, "Inter-Node\nNVSwitch / IF", "100-400 GB/s", "#e65100"),
+        (0.3, "Inter-Rack\nIB / RoCE",     "25-200 GB/s",  "#6d4c41"),
+    ]
+
+    for i, (width, label, bw, color) in enumerate(levels):
+        y = i
+        rect = plt.Rectangle((-width/2, y), width, 1.0, facecolor=color,
+                             alpha=0.85, edgecolor="white", linewidth=2.5)
+        ax.add_patch(rect)
+        ax.text(0, y + 0.5, label, ha="center", va="center", fontsize=11,
+                color="white", fontweight="bold")
+        ax.text(0, y + 0.15, bw, ha="center", va="center", fontsize=9,
+                color="white", alpha=0.9)
+
+    ax.text(-0.55, 1.0, "Bandwidth\n\u2193", fontsize=10, color="gray",
+            ha="center", va="center")
+    ax.text(0.55, 1.0, "Latency\n\u2191", fontsize=10, color="gray",
+            ha="center", va="center")
+
+    ax.set_xlim(-0.7, 0.7)
+    ax.set_ylim(-0.3, 3.3)
+    ax.axis("off")
+    ax.set_title("GPU Communication Hierarchy", fontsize=13, fontweight="bold", pad=12)
+    fig.tight_layout()
+    fig.savefig(os.path.join(OUTPUT_DIR, "comm_hierarchy.svg"), dpi=150)
+    plt.close(fig)
+    print("  [OK] comm_hierarchy.svg")
+
+
+# ============================================================
+# 8. AllReduce Ring Steps
+# ============================================================
+def ring_allreduce():
+    fig, axes = plt.subplots(1, 3, figsize=(9, 3.5))
+    steps = [
+        ("Step 1", [(0, 1, "C0"), (1, 2, "C1"), (2, 3, "C2"), (3, 0, "C0")]),
+        ("Step 2", [(0, 1, "C1"), (1, 2, "C2"), (2, 3, "C0"), (3, 0, "C1")]),
+        ("Step 3", [(0, 1, "C2"), (1, 2, "C0"), (2, 3, "C1"), (3, 0, "C2")]),
+    ]
+    colors = {"C0": "#e65100", "C1": "#1565c0", "C2": "#2e7d32"}
+
+    for idx, (title, transfers) in enumerate(steps):
+        ax = axes[idx]
+        # Position 4 GPUs in a ring
+        pos = [(0, 0.5), (-0.45, -0.15), (0, -0.5), (0.45, 0.15)]
+        gpu_pos = {}
+        for i, (x, y) in enumerate(pos):
+            circle = plt.Circle((x, y), 0.2, facecolor="#e3f2fd", edgecolor="#1565c0", linewidth=2)
+            ax.add_patch(circle)
+            ax.text(x, y, f"GPU{i}", ha="center", va="center", fontsize=9, fontweight="bold", color="#1565c0")
+            gpu_pos[i] = (x, y)
+
+        # Draw transfers
+        for src, dst, chunk in transfers:
+            sx, sy = gpu_pos[src]
+            dx, dy = gpu_pos[dst]
+            color = colors[chunk]
+            ax.annotate("", xy=(dx * 0.7 + sx * 0.3, dy * 0.7 + sy * 0.3),
+                        xytext=(sx * 0.7 + dx * 0.3, sy * 0.7 + dy * 0.3),
+                        arrowprops=dict(arrowstyle="->", color=color, lw=2, connectionstyle="arc3,rad=0.2"))
+            midx, midy = (sx + dx) / 2, (sy + dy) / 2 - 0.12
+            ax.text(midx, midy, chunk, ha="center", va="center", fontsize=8,
+                    fontweight="bold", color=color)
+
+        ax.set_xlim(-0.7, 0.7)
+        ax.set_ylim(-0.7, 0.7)
+        ax.set_aspect("equal")
+        ax.axis("off")
+        ax.set_title(f"ReduceScatter {title}", fontsize=10, fontweight="bold")
+
+    fig.suptitle("Ring AllReduce (4 GPUs, 3 steps)", fontsize=13, fontweight="bold", y=1.02)
+    fig.tight_layout()
+    fig.savefig(os.path.join(OUTPUT_DIR, "ring_allreduce.svg"), dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    print("  [OK] ring_allreduce.svg")
+
+
+# ============================================================
 # Main
 # ============================================================
 if __name__ == "__main__":
@@ -234,6 +363,9 @@ if __name__ == "__main__":
     throughput_comparison()
     nvlink_evolution()
     kernel_arithmetic_intensity()
+    chip_area_allocation()
+    comm_hierarchy()
+    ring_allreduce()
     print("=" * 50)
     print("All done")
     print("=" * 50)
