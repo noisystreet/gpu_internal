@@ -66,6 +66,7 @@ gpu_internal/
     │   ├── nvlink_nvswitch.rst
     │   ├── infinity_fabric.rst
     │   ├── cache_coherence.rst
+    │   ├── gpudirect.rst
     │   └── topology_awareness.rst
     ├── gpu_virtualization/   # GPU 虚拟化
     │   ├── index.rst
