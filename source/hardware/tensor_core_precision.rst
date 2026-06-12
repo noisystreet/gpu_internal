@@ -86,6 +86,126 @@ Tensor Core 精度与代际
      - Blackwell
      - 推理（极限压缩）
 
+Tensor Core 代际设计演进
+========================
+
+Tensor Core 从 Volta 到 Blackwell 经历了五代演进，每一代都在精度、灵活性和性能上做出了关键改进。
+
+**第 1 代：Volta（2017）—— 从零到一**
+
+Volta (SM 7.0) 首次引入 Tensor Core，专为深度学习矩阵乘法设计。其核心设计决策是 **warp 级协作 MMA**——整个 warp（32 线程）共同完成一次 ``D = A × B + C`` 的矩阵分块运算。
+
+.. code-block:: text
+
+   关键限制:
+   - 仅支持 FP16 输入 → FP32 累加，单一矩阵形状 16×16×16
+   - 编程接口仅有 WMMA API（高层 fragment 抽象）
+   - 仅用于 GEMM，卷积需要 im2col 转换
+   - 精度约 1-2 ULP，不遵循 IEEE 754
+
+   Volta 的 Tensor Core 实现了 ~125 TFLOPS (FP16)，
+   相比 CUDA Core FP32 的 ~15 TFLOPS 提升约 8x。
+
+第 2 代：Turing（2018）—— 整数量化
+
+Turing (SM 7.5) 将 Tensor Core 推向推理场景，首次引入 INT8 和 INT4 量化支持：
+
+.. code-block:: text
+
+   Turing 的设计重点:
+   - INT8/INT4 精度服务于推理量化
+   - 每 SM Tensor Core 数不变（8 个），但利用 INT8 吞吐翻倍
+   - Turing 在设计上更侧重图形和实时光线追踪
+   - 并未增加新的矩阵形状或稀疏支持
+
+   T4 GPU 的 INT8 Tensor Core 峰值 ~130 TOPS，
+   成为云端推理的首选硬件。
+
+**第 3 代：Ampere（2020）—— 灵活性与 BF16**
+
+Ampere (SM 8.0) 是 Tensor Core 架构最重要的迭代，解决了 Volta/Turing 的多个核心限制：
+
+.. code-block:: text
+
+   主要改进:
+   1. 灵活矩阵形状 — 不再限于 16×16×16
+      - m16n8k16: 主流 GEMM 优化
+      - m16n8k8: BF16 更小内积维度
+      - m8n8k4: 小矩阵快速计算
+   2. BF16 支持 — 保留 FP32 动态范围，无需混合精度缩放
+   3. TF32 格式 — 19 位精度，输入 FP32 自动截断，无需改代码
+   4. 2:4 稀疏支持 (mma.sp) — 结构化稀疏 2x 加速
+   5. 低精度 PTX (mma API) — 替代 WMMA 的底层接口
+
+   代价: 每 SM Tensor Core 从 8 减至 4 个，
+   但总 TFLOPS 从 125 提升到 312 (FP16)。
+
+**第 4 代：Hopper（2022）—— 更大的规模**
+
+Hopper (SM 9.0) 的目标是突破 Ampere 的吞吐天花板，通过增加操作粒度降低指令发射开销：
+
+.. code-block:: text
+
+   关键改进:
+   1. Warpgroup MMA (wgmma) — 4 个 warp 协作完成更大的矩阵分块
+      减少指令发射次数，提升每指令的计算密度
+   2. FP8 支持 (E4M3 / E5M2) — 进一步降低内存带宽需求
+      专为 LLM 训练设计，支持混合 FP8 训练
+   3. TMA (Tensor Memory Accelerator) — 独立硬件单元管理数据加载
+      warp 不再需要参与数据搬运，专注计算
+   4. DPX 指令 — 在 Tensor Core 中加速动态规划算法
+      (如 Smith-Waterman DNA 序列比对)
+
+   H100 的 Tensor Core FP16 峰值 ~989 TFLOPS，
+   相比 A100 提升 ~3.2x。
+
+**第 5 代：Blackwell（2024）—— 极限压缩**
+
+Blackwell 延续了精度越降越低的趋势，首次引入 FP6 和 FP4：
+
+.. code-block:: text
+
+   关键改进:
+   1. FP6 支持 — 在 FP8 和 FP4 之间的折中精度
+      适用于对精度敏感但需要超过 FP8 压缩比的场景
+   2. FP4 支持 (E3M0) — 极限压缩，推理场景
+      单卡可加载更大模型，减少 GPU 间通信
+   3. 第二代 Transformer Engine — 自动管理 FP4/FP6/FP8 精度切换
+   4. 每 SM Tensor Core 架构未公开，但总吞吐大幅提升
+
+   B200 的 FP4 Tensor Core 峰值 ~9000 TFLOPS，
+   相比 H100 FP8 提升 ~4.5x。
+
+**代际演进的核心矛盾**：
+
+.. list-table::
+   :header-rows: 1
+
+   * - 矛盾维度
+     - 早期（Volta/Turing）
+     - 中期（Ampere）
+     - 近期（Hopper/Blackwell）
+   * - 精度策略
+     - 少数固定精度
+     - 多种精度可选
+     - 自动精度管理
+   * - 编程抽象
+     - WMMA 高层 API
+     - mma PTX 底层指令
+     - wgmma + TMA 硬件管理
+   * - 矩阵形状
+     - 单一 16x16x16
+     - 灵活多形状
+     - Warpgroup 聚合
+   * - 使用方式
+     - 仅 cuBLAS/cuDNN
+     - 开放给 CUTLASS/WMMA
+     - TMA 异步数据流
+   * - 应用场景
+     - 深度学习训练
+     - 训练 + 推理 + HPC
+     - LLM + 科学计算 + 推理
+
 Tensor Core vs CUDA Core 吞吐对比
 ======================================
 
